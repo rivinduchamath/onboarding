@@ -2,6 +2,7 @@ package com.spordee.user.entity.sportsuserdata;
 
 import com.spordee.user.annotations.CascadeSave;
 import com.spordee.user.entity.profiledata.cascadetables.UserVideo;
+import com.spordee.user.entity.sportsuserdata.cascadetables.sports.Baseball;
 import com.spordee.user.entity.sportsuserdata.cascadetables.sports.Basketball;
 import com.spordee.user.entity.sportsuserdata.cascadetables.sports.Hockey;
 import com.spordee.user.entity.sportsuserdata.cascadetables.sports.Soccer;
@@ -36,6 +37,10 @@ public class UserSports {
     @CascadeSave
     @Field("hockey")
     private List<Hockey> hockey;
+    @DBRef
+    @CascadeSave
+    @Field("baseball")
+    private List<Baseball> baseball;
 
     @Field("created_date")
     private String createdDate; // Epoch Time
