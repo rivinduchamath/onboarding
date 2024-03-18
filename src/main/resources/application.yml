@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri:
+      auto-index-creation: true
+  application:
+    name: XENIA-SERVICE

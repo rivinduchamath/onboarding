@@ -2,9 +2,9 @@ package com.spordee.user.entity.primaryUserData;
 
 
 import com.querydsl.core.annotations.QueryEntity;
-import com.spordee.user.annotations.CascadeSave;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserEmails;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
+import com.spordee.user.enums.Gender;
 import com.spordee.user.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +33,9 @@ public class PrimaryUserDetails {
     private String firstName;
     @Field("last_name")
     private String lastName;
+    private Gender gender;
+    private String country;
+    private String city;
     @Field("is_premium")
     private boolean isPremium;
     @Indexed(unique = true)
@@ -45,14 +48,15 @@ public class PrimaryUserDetails {
     @Field("is_verified")
     private boolean isVerified;
     @Field("birth_day")
-    private String birthDay;
+    private long birthDay;
     @Field("created_date")
-    private String createdDate;
+    private long createdDate;
     @Field("updated_date")
-    private String updatedDate;
-    @DBRef @CascadeSave @Field("user_images")
+    private long updatedDate;
+    @DBRef
+    @Field("user_images")
     private List<UserImages> userImage;
-    @DBRef @CascadeSave @Field("user_emails")
-    private List<UserEmails> userEmail;
+    @Field("user_email")
+    private String userEmail;
 
 }

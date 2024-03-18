@@ -15,8 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class AmericanFootball {
     @Id
     private String id;
-    private float height;
-    private float weight;
+
     private String arm;
     private String hand;
     @Field("positions")

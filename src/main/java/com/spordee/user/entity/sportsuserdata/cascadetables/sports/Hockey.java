@@ -18,8 +18,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Hockey {
     @Id
     private String id;
-    private float height;
-    private float weight;
     @Field("hockey_position")
     private HockeyPosition hockeyPosition;
     @Field("hockey_shoots")

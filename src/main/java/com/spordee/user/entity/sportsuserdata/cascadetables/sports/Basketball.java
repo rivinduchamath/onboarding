@@ -16,8 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Basketball {
     @Id
     private String id;
-    private float height;
-    private float weight;
+
     private float wingspan;
     @Field("basket_ball_position")
     private BasketballPosition basketballPosition;
