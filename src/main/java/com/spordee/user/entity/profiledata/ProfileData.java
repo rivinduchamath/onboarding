@@ -1,6 +1,5 @@
 package com.spordee.user.entity.profiledata;
 
-import com.querydsl.core.annotations.QueryEntity;
 import com.spordee.user.entity.profiledata.cascadetables.Bookmarks;
 import com.spordee.user.entity.profiledata.cascadetables.UserAddress;
 import com.spordee.user.entity.profiledata.cascadetables.UserMobileNumber;
@@ -20,7 +19,6 @@ import java.util.Map;
 @Setter
 @Getter
 @AllArgsConstructor
-@QueryEntity
 @Document(collation = "profile_data")
 @NoArgsConstructor
 public class ProfileData {

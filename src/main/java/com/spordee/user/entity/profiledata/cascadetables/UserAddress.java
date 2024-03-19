@@ -23,7 +23,6 @@ public class UserAddress {
     @Field("address_line_two")
     private String addressLineTwo;
     @Field("user_name")
-    @Indexed
     private String userName;
     @Field("address_line_three")
     private String addressLineThree;

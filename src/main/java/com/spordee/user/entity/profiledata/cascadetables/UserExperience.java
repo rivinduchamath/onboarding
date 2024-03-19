@@ -18,7 +18,6 @@ public class UserExperience {
     private String id;
     private String position;
     @Field("user_name")
-    @Indexed
     private String userName;
     @Field("joined_date")
     private String joinedDate;

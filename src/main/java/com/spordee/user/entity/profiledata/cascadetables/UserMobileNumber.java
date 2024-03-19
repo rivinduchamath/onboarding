@@ -22,7 +22,6 @@ public class UserMobileNumber {
     @Field("country_code")
     private String countryCode;
     @Field("user_name")
-    @Indexed
     private String userName;
     @Field("created_date")
     private String createdDate;

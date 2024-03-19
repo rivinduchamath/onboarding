@@ -18,7 +18,7 @@ public class UserSports {
     @Id
     @Field("user_name")
     private String userName;
-    @DBRef
+    @DBRef(lazy = true)
     @Field("soccer")
     private Soccer soccer;
     @DBRef

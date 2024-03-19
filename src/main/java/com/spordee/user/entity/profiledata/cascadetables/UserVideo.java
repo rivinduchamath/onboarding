@@ -22,7 +22,7 @@ public class UserVideo {
     private boolean isActive;
     @Field("user_video_type")
     private UserVideoType userVideoType;
-    @Field("user_name") @Indexed
+    @Field("user_name")
     private String userName;
     @TextIndexed
     private String description;

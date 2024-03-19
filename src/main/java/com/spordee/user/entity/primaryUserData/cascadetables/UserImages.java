@@ -2,7 +2,8 @@ package com.spordee.user.entity.primaryUserData.cascadetables;
 
 import com.spordee.user.enums.UserImageType;
 import lombok.*;
-import nonapi.io.github.classgraph.json.Id;
+
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,7 +25,6 @@ public class UserImages {
     @Field("image_type")
     private UserImageType imageType; // Enum
     @Field("user_name")
-    @Indexed
     private String userName;
     @TextIndexed
     private String description;

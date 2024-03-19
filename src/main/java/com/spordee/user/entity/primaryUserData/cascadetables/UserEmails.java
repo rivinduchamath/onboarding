@@ -22,7 +22,6 @@ public class UserEmails {
     @Field("created_date")
     private String createdDate;
     @Field("user_name")
-    @Indexed
     private String userName;
     @Field("updated_date")
     private String updatedDate;

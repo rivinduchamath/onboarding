@@ -18,7 +18,6 @@ public class Bookmarks {
     @Field("post_id")
     private String postId;
     @Field("user_name")
-    @Indexed
     private String userName;
     @Field("created_date")
     private String createdDate;
