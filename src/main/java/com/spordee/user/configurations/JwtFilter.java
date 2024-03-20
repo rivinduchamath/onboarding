@@ -7,8 +7,7 @@ import com.spordee.user.exceptions.OAuth2AuthenticationProcessingException;
 import com.spordee.user.tokenmapper.TokenIntrospectionResponse;
 import com.spordee.user.tokenmapper.objects.Role;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.util.*;
 
-import static com.spordee.user.util.AttributesCommon.JWT_HEADER_AUTH_ROLES;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -38,7 +36,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
     @Value("${jwt.secret}")
     private String secret;
-
 
     @Value("${jwt.tokenDecryptCode}")
     private String tokenDecryptCode;
