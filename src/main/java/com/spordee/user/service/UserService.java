@@ -1,7 +1,8 @@
 package com.spordee.user.service;
 
 import com.spordee.user.dto.InitialUserSaveRequestDto;
+import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 
 public interface UserService {
-    void saveOnboardingUsers(InitialUserSaveRequestDto initialUserSaveRequestDto);
+    PrimaryUserDetails saveOnboardingUsers(InitialUserSaveRequestDto initialUserSaveRequestDto);
 }
