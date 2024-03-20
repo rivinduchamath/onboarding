@@ -1,6 +1,6 @@
 package com.spordee.user.response.common;
 
-import com.spordee.authentication.util.enums.CommonMessages;
+import com.spordee.user.enums.CommonMessages;
 import lombok.*;
 
 @Getter

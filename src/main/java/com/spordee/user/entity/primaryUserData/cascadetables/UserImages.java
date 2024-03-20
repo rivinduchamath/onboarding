@@ -24,8 +24,6 @@ public class UserImages {
     private boolean isActive;
     @Field("image_type")
     private UserImageType imageType; // Enum
-    @Field("user_name")
-    private String userName;
     @TextIndexed
     private String description;
     @Field("created_date")

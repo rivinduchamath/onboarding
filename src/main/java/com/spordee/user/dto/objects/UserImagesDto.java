@@ -15,7 +15,6 @@ public class UserImagesDto {
     private String imageUrl;
     private boolean isActive;
     private UserImageType imageType; // Enum
-    private String userName;
     private String description;
     private String createdDate;
     private String updatedDate;
