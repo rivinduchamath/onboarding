@@ -73,6 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
         userDetails.setUserName(subject);
         return userDetails;
     }
+
     public String tokenDecryption(String encryptedToken) {
         byte[] keyBytes = tokenDecryptCode.getBytes();
         byte[] validKeyBytes = new byte[32]; // AES-256 key length
