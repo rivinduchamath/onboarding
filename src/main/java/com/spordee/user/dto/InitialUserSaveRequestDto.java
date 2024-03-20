@@ -34,7 +34,6 @@ public class InitialUserSaveRequestDto {
     private long updatedDate;
     private List<UserImagesDto> userImagesDtos;
     private List<UserSportsDto> userSportsDtos;
-    private List<String> roles;
     private String userEmail;
 
 }
