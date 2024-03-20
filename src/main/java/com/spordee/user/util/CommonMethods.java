@@ -53,7 +53,7 @@ public class CommonMethods {
                 .country(initialUserSaveRequestDto.getCountry())
                 .height(initialUserSaveRequestDto.getHeight())
                 .weight(initialUserSaveRequestDto.getWeight())
-                .sport(initialUserSaveRequestDto.getUserSportsDtos())
+                .userStatus(UserStatus.ACTIVE)
                 .createdDate(currentTime)
                 .birthDay(initialUserSaveRequestDto.getBirthDay())
                 .userEmail(initialUserSaveRequestDto.getUserEmail())
@@ -61,6 +61,7 @@ public class CommonMethods {
                 .build();
 
         if(initialUserSaveRequestDto.getRegistrationType().equals(PLAYER)){
+            primaryUserDetails.setSport(initialUserSaveRequestDto.getUserSportsDtos());
             primaryUserDetails.setGender(initialUserSaveRequestDto.getGender());
             primaryUserDetails.setUserStatus(UserStatus.ACTIVE);
             primaryUserDetails.setRoles(Collections.singletonList(initialUserSaveRequestDto.getRegistrationType().toString()));
