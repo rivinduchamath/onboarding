@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 @Builder
 public class UserSportsDto {
-    private String userName;
+
     private Soccer soccer;
     private Basketball basketball;
     private Cricket cricket;
