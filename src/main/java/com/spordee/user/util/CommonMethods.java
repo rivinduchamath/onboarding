@@ -45,6 +45,9 @@ public class CommonMethods {
 
     public static PrimaryUserDetails savePrimaryUserDetailsFromDto(InitialUserSaveRequestDto initialUserSaveRequestDto){
         long currentTime = getCurrentEpochTimeInSec();
+        if(initialUserSaveRequestDto.getUserImagesDtos() == null){
+            return null;
+        }
         List<UserImages> userImages = saveUserImagesFromDto(initialUserSaveRequestDto.getUserImagesDtos());
         PrimaryUserDetails primaryUserDetails = PrimaryUserDetails.builder()
                 .firstName(initialUserSaveRequestDto.getFirstName())
@@ -76,5 +79,7 @@ public class CommonMethods {
         }
         return primaryUserDetails;
     }
+
+
 
 }

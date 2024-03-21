@@ -32,16 +32,22 @@ private final UserService userService;
                 httpServletResponse.setStatus(HttpServletResponse.SC_OK);
                 commonResponse.setData(primaryUserDetails);
                 commonResponse.setStatus(StatusType.STATUS_SUCCESS);
-                commonResponse.setMeta(new MetaData(Boolean.FALSE,CommonMessages.REQUEST_SUCCESS, CODE_SUCCESS.getCode(),"Saved Successfully"));
+                commonResponse.setMeta(new MetaData(false,CommonMessages.REQUEST_SUCCESS, CODE_SUCCESS.getCode(),"Saved Successfully"));
+                return commonResponse;
+            }else{
+                httpServletResponse.setStatus(HttpServletResponse.SC_CONFLICT);
+                commonResponse.setData("Null Found.");
+                commonResponse.setStatus(StatusType.STATUS_FAIL);
+                commonResponse.setMeta(new MetaData(true,CommonMessages.REQUEST_CONFLICT, CODE_CONFLICT.getCode(),"Null Found."));
                 return commonResponse;
             }
         }catch(Exception e){
             httpServletResponse.setStatus(HttpServletResponse.SC_CONFLICT);
             commonResponse.setData(e.getMessage());
             commonResponse.setStatus(StatusType.STATUS_FAIL);
-            commonResponse.setMeta(new MetaData(Boolean.FALSE,CommonMessages.REQUEST_CONFLICT, CODE_CONFLICT.getCode(),"Failed."));
+            commonResponse.setMeta(new MetaData(true,CommonMessages.REQUEST_CONFLICT, CODE_CONFLICT.getCode(),"Failed."));
             return commonResponse;
         }
-        return commonResponse;
+
     }
 }
