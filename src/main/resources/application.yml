@@ -1,8 +1,11 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://xenia:xenia@xenia.0r1mx1j.mongodb.net/phaseTwoDatabase2?retryWrites=true&w=majority&ssl=true
+#      uri: mongodb+srv://xenia:xenia@xenia.0r1mx1j.mongodb.net/phaseTwoDatabase2?retryWrites=true&w=majority&ssl=true
       auto-index-creation: true
+      host: localhost
+      port: 27017
+      database: SpordOnboarding
   application:
     name: XENIA-SERVICE
 

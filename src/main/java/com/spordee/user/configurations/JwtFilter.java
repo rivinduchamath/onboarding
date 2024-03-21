@@ -62,7 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-    private UserDetails getUserDetails(String token) {
+    public UserDetails getUserDetails(String token) {
         TokenIntrospectionResponse userDetails = new TokenIntrospectionResponse();
         Claims claims = jwtUtil.extractAllClaims(token);
         String subject = (String) claims.get(Claims.SUBJECT);

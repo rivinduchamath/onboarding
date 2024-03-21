@@ -30,7 +30,7 @@ public class UserSports {
     private AmericanFootball americanFootball;
     @DBRef
     @Field("hockey")
-    private Hockey hockey;
+    private IceHockey hockey;
     @DBRef
     @Field("baseball")
     private Baseball baseball;

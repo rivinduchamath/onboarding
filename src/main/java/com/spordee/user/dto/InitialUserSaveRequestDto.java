@@ -2,13 +2,14 @@ package com.spordee.user.dto;
 
 import com.spordee.user.dto.objects.UserImagesDto;
 import com.spordee.user.dto.objects.UserSportsDto;
-import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.enums.Gender;
 import com.spordee.user.enums.RegistrationType;
+import com.spordee.user.enums.Sport;
 import com.spordee.user.enums.UserStatus;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,6 +40,8 @@ public class InitialUserSaveRequestDto {
     private String favClubTeam;
     private String favAllTimePlayer;
     private String favNationalTeam;
+    private Sport favSport;
+    private Set<Sport> secondaryFavSports;
 
     private String userEmail;
 

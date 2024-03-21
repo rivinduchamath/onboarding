@@ -4,6 +4,7 @@ package com.spordee.user.entity.primaryUserData;
 import com.spordee.user.dto.objects.UserSportsDto;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.enums.Gender;
+import com.spordee.user.enums.Sport;
 import com.spordee.user.enums.UserStatus;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -55,7 +57,9 @@ public class PrimaryUserDetails {
     @Field("favourite_sport")
     private UserSportsDto sport;
     private String favClubTeam;
-    private String favSport;
+    private String favPlayer;
+    private Sport favSport;
+    private Set<Sport> secondaryFavSports;
     private String favAllTimePlayer;
     private String favNationalTeam;
     private String weight;

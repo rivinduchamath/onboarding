@@ -15,7 +15,7 @@ public class UserSportsDto {
     private Basketball basketball;
     private Cricket cricket;
     private AmericanFootball americanFootball;
-    private Hockey hockey;
+    private IceHockey iceHockey;
     private Baseball baseball;
     private Rugby rugby;
     private String createdDate; // Epoch Time

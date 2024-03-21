@@ -9,12 +9,13 @@ import com.spordee.user.enums.UserStatus;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static com.spordee.user.enums.RegistrationType.FAN;
 import static com.spordee.user.enums.RegistrationType.PLAYER;
 
-public class CommonMethods {
+public  class CommonMethods {
 
     private CommonMethods(){
 
@@ -58,23 +59,36 @@ public class CommonMethods {
                 .birthDay(initialUserSaveRequestDto.getBirthDay())
                 .userEmail(initialUserSaveRequestDto.getUserEmail())
                 .userImage(userImages)
+                .roles(Collections.singletonList(initialUserSaveRequestDto.getRegistrationType().toString()))
                 .build();
 
         if(initialUserSaveRequestDto.getRegistrationType().equals(PLAYER)){
             primaryUserDetails.setSport(initialUserSaveRequestDto.getUserSportsDtos());
             primaryUserDetails.setGender(initialUserSaveRequestDto.getGender());
-            primaryUserDetails.setUserStatus(UserStatus.ACTIVE);
-            primaryUserDetails.setRoles(Collections.singletonList(initialUserSaveRequestDto.getRegistrationType().toString()));
 
         }else if(initialUserSaveRequestDto.getRegistrationType().equals(FAN)){
             // favourite -> Club team, player , all time player , national team
-            primaryUserDetails.setFavSport(initialUserSaveRequestDto.getFavPlayer());
+            primaryUserDetails.setFavPlayer(initialUserSaveRequestDto.getFavPlayer());
+            primaryUserDetails.setFavSport(initialUserSaveRequestDto.getFavSport());
+            primaryUserDetails.setSecondaryFavSports(initialUserSaveRequestDto.getSecondaryFavSports());
             primaryUserDetails.setFavClubTeam(initialUserSaveRequestDto.getFavClubTeam());
             primaryUserDetails.setFavNationalTeam(initialUserSaveRequestDto.getFavNationalTeam());
             primaryUserDetails.setFavAllTimePlayer(initialUserSaveRequestDto.getFavAllTimePlayer());
 
         }
         return primaryUserDetails;
+    }
+
+    public static Date getDateUTC(){
+        // Get the current system time in milliseconds
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // Get the current UTC time in milliseconds
+        long utcTimeMillis = currentTimeMillis - java.util.TimeZone.getDefault().getRawOffset();
+
+        // Create a new Date object with the UTC time
+
+        return new Date(utcTimeMillis);
     }
 
 }
