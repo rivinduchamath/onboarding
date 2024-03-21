@@ -27,8 +27,8 @@ public class UserImages {
     @TextIndexed
     private String description;
     @Field("created_date")
-    private String createdDate;
+    private long createdDate;
     @Field("updated_date")
-    private String updatedDate;
+    private long updatedDate;
 
 }

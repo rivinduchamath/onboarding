@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum CommonMessages {
     REQUEST_SUCCESS("Success Request"),
     BAD_CREDENTIALS("Bad Credentials"),
+    FORBIDDEN_ACCESS("FORBIDDEN Access"),
     REQUEST_FAIL("Fail Request"),
     REQUEST_NO_LONGER_USED("No Longer Used"),
     INTERNAL_SERVER_ERROR("INTERNAL SERVER ERROR"),

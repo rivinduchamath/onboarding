@@ -19,6 +19,7 @@ import java.util.Set;
 @Builder
 public class InitialUserSaveRequestDto {
     private String id;
+    private String userName;
     private String firstName;
     private RegistrationType registrationType;
     private String lastName;
