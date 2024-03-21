@@ -1,10 +1,7 @@
 package com.spordee.user.response.common;
 
-<<<<<<< HEAD
-import com.spordee.user.enums.CommonMessages;
-=======
 
->>>>>>> b87aca9 (Add Jwt)
+import com.spordee.user.enums.CommonMessages;
 import lombok.*;
 
 @Getter
@@ -14,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 public class MetaData {
     private boolean error;
+    private CommonMessages message;
     private int statusCode;
     private String description;
 
