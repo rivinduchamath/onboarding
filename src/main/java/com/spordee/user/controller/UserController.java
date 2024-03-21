@@ -28,6 +28,7 @@ public class UserController {
 
 private final UserService userService;
 
+
     @PostMapping("${api.class.method}")
     public CommonResponse saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto, HttpServletResponse httpServletResponse){
         CommonResponse commonResponse  = new CommonResponse();
