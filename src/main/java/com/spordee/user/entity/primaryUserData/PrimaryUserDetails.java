@@ -1,15 +1,12 @@
 package com.spordee.user.entity.primaryUserData;
 
 
+import com.spordee.user.dto.objects.UserSportsDto;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.enums.Gender;
 import com.spordee.user.enums.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -21,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Document(collation = "primary_user_details")
 @NoArgsConstructor
+@Builder
 public class PrimaryUserDetails {
 
     @Id
@@ -54,5 +52,13 @@ public class PrimaryUserDetails {
     private List<UserImages> userImage;
     @Field("user_email")
     private String userEmail;
+    @Field("favourite_sport")
+    private UserSportsDto sport;
+    private String favClubTeam;
+    private String favSport;
+    private String favAllTimePlayer;
+    private String favNationalTeam;
+    private String weight;
+    private String height;
 
 }

@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Setter
 @Getter
 @ToString

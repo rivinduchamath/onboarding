@@ -1,6 +1,16 @@
 package com.spordee.user.enums.sports.hockey;
 
 public enum HockeyPosition {
-    GOALIE, DEFENCE_RIGHT, DEFENCE_LEFT, CENTRE,WINGER_RIGHT
-    ,WINGER_LEFT
+    GOALIE("Goalie"),
+    DEFENCE_RIGHT("Defense Right"),
+    DEFENCE_LEFT("Defense Left"),
+    CENTRE("Center"),
+    WINGER_RIGHT("Winger Right"),
+    WINGER_LEFT("Winger Left");
+
+    private String value;
+
+    HockeyPosition(String value) {
+        this.value = value;
+    }
 }
