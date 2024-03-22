@@ -1,6 +1,7 @@
 package com.spordee.user.response.common;
 
 import com.spordee.user.enums.CommonMessages;
+
 import lombok.*;
 
 @Getter
@@ -10,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 public class MetaData {
     private boolean error;
-    private CommonMessages message;
     private int statusCode;
     private String description;
 

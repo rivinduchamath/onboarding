@@ -39,7 +39,6 @@ public class InitialUserSaveRequestDto {
     private String favClubTeam;
     private String favAllTimePlayer;
     private String favNationalTeam;
-
     private String userEmail;
 
 }

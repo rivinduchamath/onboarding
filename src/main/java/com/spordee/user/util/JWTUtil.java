@@ -16,7 +16,6 @@ public class JWTUtil {
 
     //@TODO Add base 64 Encrypted Key and here decode it
 
-//    }
     public Claims getALlClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
     }
