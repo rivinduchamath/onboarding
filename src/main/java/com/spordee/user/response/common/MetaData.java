@@ -15,9 +15,4 @@ public class MetaData {
     private int statusCode;
     private String description;
 
-//    public MetaData(boolean error, CommonMessages message, int statusCode) {
-//        this.error = error;
-//        this.message = message;
-//        this.statusCode = statusCode;
-//    }
 }

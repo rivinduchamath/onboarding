@@ -32,26 +32,6 @@ public  class CommonMethods {
     public static long getCurrentEpochTimeInSec(){
         return Instant.now().getEpochSecond();
     }
-    public  String tokenDecryption(String encryptedToken) {
-        byte[] keyBytes = tokenDecryptCode.getBytes();
-        byte[] validKeyBytes = new byte[32]; // AES-256 key length
-        System.arraycopy(keyBytes, 0, validKeyBytes, 0, Math.min(keyBytes.length, validKeyBytes.length));
-        Key key = new SecretKeySpec(validKeyBytes, "AES");
-        Cipher cipher;
-        try {
-            byte[] ivAndEncryptedTokenBytes = Base64.getDecoder().decode(encryptedToken);
-            byte[] ivBytes = Arrays.copyOfRange(ivAndEncryptedTokenBytes, 0, 16); // Extract the IV from the encrypted data
-            byte[] encryptedTokenBytes = Arrays.copyOfRange(ivAndEncryptedTokenBytes, 16, ivAndEncryptedTokenBytes.length);
-
-            GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, ivBytes);
-            cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            cipher.init(Cipher.DECRYPT_MODE, key, gcmParameterSpec);
-            byte[] decryptedTokenBytes = cipher.doFinal(encryptedTokenBytes);
-            return new String(decryptedTokenBytes);
-        } catch (Exception e) {
-            throw new OAuth2AuthenticationProcessingException(e.getMessage());
-        }
-    }
 
     public static List<UserImages> saveUserImagesFromDto(List<UserImagesDto> userImagesDtoList, long currentTime) {
         if (!userImagesDtoList.isEmpty()) {
