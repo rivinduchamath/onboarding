@@ -33,6 +33,8 @@ public  class CommonMethods {
         return Instant.now().getEpochSecond();
     }
 
+
+
     public static List<UserImages> saveUserImagesFromDto(List<UserImagesDto> userImagesDtoList, long currentTime) {
         if (!userImagesDtoList.isEmpty()) {
             return userImagesDtoList.stream()
@@ -67,8 +69,9 @@ public  class CommonMethods {
                 .roles(Collections.singletonList(initialUserSaveRequestDto.getRegistrationType().toString()));
 
         if(initialUserSaveRequestDto.getRegistrationType().equals(PLAYER)){
-            primaryUserDetails.sport(initialUserSaveRequestDto.getUserSportsDtos())
-                    .gender(initialUserSaveRequestDto.getGender());
+//            primaryUserDetails.sport(initialUserSaveRequestDto.getUserSportsDtos())
+                    primaryUserDetails.gender(initialUserSaveRequestDto.getGender());
+
 
         }else if(initialUserSaveRequestDto.getRegistrationType().equals(FAN)){
             primaryUserDetails.favPlayer(initialUserSaveRequestDto.getFavPlayer())

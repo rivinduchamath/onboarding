@@ -49,7 +49,7 @@ public class PrimaryUserDetails {
     @Field("updated_date")
     private long updatedDate;
     private List<String> roles;
-    @DBRef
+//    @DBRef
     @Field("user_images")
     private List<UserImages> userImage;
     @Field("user_email")

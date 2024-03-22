@@ -9,6 +9,6 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.create("http://auth-service-url"); // Replace with your authentication service URL
+        return WebClient.create("http://localhost:8080"); // Replace with your authentication service URL
     }
 }

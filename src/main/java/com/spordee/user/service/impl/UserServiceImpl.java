@@ -3,9 +3,11 @@ package com.spordee.user.service.impl;
 
 import com.spordee.user.dto.InitialUserSaveRequestDto;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
+import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.enums.CommonMessages;
 import com.spordee.user.enums.StatusType;
 import com.spordee.user.repository.PrimaryUserDataRepository;
+import com.spordee.user.repository.SportsRepository;
 import com.spordee.user.response.common.CommonResponse;
 import com.spordee.user.response.common.MetaData;
 import com.spordee.user.service.UserService;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import static com.spordee.user.exceptions.GlobalExceptionHandler.handleExceptionRootReactive;
-import static com.spordee.user.util.CommonMethods.savePrimaryUserDetailsFromDto;
+import static com.spordee.user.util.CommonMethods.*;
 import static com.spordee.user.util.StatusCodes.CODE_SUCCESS;
 
 @Slf4j
@@ -25,6 +27,7 @@ import static com.spordee.user.util.StatusCodes.CODE_SUCCESS;
 public class UserServiceImpl implements UserService {
 
     private final PrimaryUserDataRepository primaryUserDataRepository;
+    private final SportsRepository sportsRepository;
 
 
     @Override
@@ -32,6 +35,19 @@ public class UserServiceImpl implements UserService {
                                                     CommonResponse commonResponse) {
         log.info("LOG:: UserServiceImpl saveOnboardingUsers");
         PrimaryUserDetails primaryUserDetails = savePrimaryUserDetailsFromDto(initialUserSaveRequestDto);
+        if(initialUserSaveRequestDto.getUserSportsDtos() !=null){
+            UserSports userSports =  UserSports.builder()
+                    .rugby(initialUserSaveRequestDto.getUserSportsDtos().getRugby())
+                    .baseball(initialUserSaveRequestDto.getUserSportsDtos().getBaseball())
+                    .americanFootball(initialUserSaveRequestDto.getUserSportsDtos().getAmericanFootball())
+                    .hockey(initialUserSaveRequestDto.getUserSportsDtos().getIceHockey())
+                    .soccer(initialUserSaveRequestDto.getUserSportsDtos().getSoccer())
+                    .cricket(initialUserSaveRequestDto.getUserSportsDtos().getCricket())
+                    .basketball(initialUserSaveRequestDto.getUserSportsDtos().getBasketball())
+                    .createdDate(String.valueOf(getCurrentEpochTimeInSec()))
+                    .build();
+            sportsRepository.save(userSports);
+        }
         PrimaryUserDetails save = primaryUserDataRepository.save(primaryUserDetails);
         return Mono.just(save).map(savedPrimaryUserDetails -> {
             commonResponse.setData(savedPrimaryUserDetails);
@@ -40,6 +56,7 @@ public class UserServiceImpl implements UserService {
                     "Saved Successfully"));
             log.debug("LOG:: UserServiceImpl saveOnboardingUsers {} save Success ",
                     savedPrimaryUserDetails.getUserName());
+
             return commonResponse;
         }).onErrorResume(exception -> handleExceptionRootReactive(
                 CommonMessages.INTERNAL_SERVER_ERROR,

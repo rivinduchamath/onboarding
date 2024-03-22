@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collation = "user_images")
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -38,20 +38,18 @@ import reactor.core.publisher.Mono;
 public class ApplicationSecurity {
     @Bean
     SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-                                                JwtTokenProvider tokenProvider,
-                                                ReactiveAuthenticationManager reactiveAuthenticationManager) {
+                                                JwtTokenProvider tokenProvider
+                                                ) {
         final String PATH_POSTS = "/posts/**";
 
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .authenticationManager(reactiveAuthenticationManager)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(it -> it
 //                        .pathMatchers(HttpMethod.GET, PATH_POSTS).permitAll()
 //                        .pathMatchers(HttpMethod.DELETE, PATH_POSTS).hasRole("ADMIN")
                         .pathMatchers(PATH_POSTS).authenticated()
                         .pathMatchers("/me").authenticated()
-                        .pathMatchers("/users/{user}/**").access(this::currentUserMatchesPath)
                         .anyExchange().permitAll()
                 )
                 .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
@@ -60,27 +58,6 @@ public class ApplicationSecurity {
 
     }
 
-    private Mono<AuthorizationDecision> currentUserMatchesPath(Mono<Authentication> authentication,
-                                                               AuthorizationContext context) {
-
-        return authentication
-                .map(a -> context.getVariables().get("user").equals(a.getName()))
-                .map(AuthorizationDecision::new);
-
-    }
-
-    @Bean
-    public ReactiveUserDetailsService userDetailsService(PrimaryUserDataRepository users) {
-        return username -> (Mono<UserDetails>) users.findByUserName(username);
-    }
-
-    @Bean
-    public ReactiveAuthenticationManager reactiveAuthenticationManager(ReactiveUserDetailsService userDetailsService,
-                                                                       PasswordEncoder passwordEncoder) {
-        var authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        authenticationManager.setPasswordEncoder(passwordEncoder);
-        return authenticationManager;
-    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
