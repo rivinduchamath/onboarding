@@ -16,8 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @Builder
 public class UserImages {
-    @Id
-    private String id;
+
     @Field("image_url")
     private String imageUrl;
     @Field("is_active")

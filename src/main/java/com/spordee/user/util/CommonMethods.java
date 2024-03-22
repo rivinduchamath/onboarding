@@ -51,6 +51,7 @@ public  class CommonMethods {
     public static PrimaryUserDetails savePrimaryUserDetailsFromDto(InitialUserSaveRequestDto initialUserSaveRequestDto){
         long currentTime = getCurrentEpochTimeInSec();
         PrimaryUserDetails.PrimaryUserDetailsBuilder primaryUserDetails = PrimaryUserDetails.builder()
+                .id(initialUserSaveRequestDto.getId())
                 .userName(initialUserSaveRequestDto.getUserName())
                 .firstName(initialUserSaveRequestDto.getFirstName())
                 .lastName(initialUserSaveRequestDto.getLastName())

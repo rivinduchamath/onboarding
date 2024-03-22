@@ -54,8 +54,6 @@ public class PrimaryUserDetails {
     private List<UserImages> userImage;
     @Field("user_email")
     private String userEmail;
-    @Field("favourite_sport")
-    private UserSportsDto sport;
     private String favClubTeam;
     private String favPlayer;
     private Sport favSport;

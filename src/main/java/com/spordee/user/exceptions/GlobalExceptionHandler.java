@@ -38,8 +38,15 @@ public class GlobalExceptionHandler extends Exception {
 
 //        return commonResponse;
 //    }
-
-    public static Mono<CommonResponse> handleExceptionRootReactive(Throwable exception, CommonResponse commonResponse) {
+    @ExceptionHandler(Exception.class)
+    public static Mono<CommonResponse> handleExceptionRootReactive(
+            CommonMessages commonMessages,
+                                          StatusType statusType,
+                                          HttpStatus httpStatus,
+                                          Throwable exception,
+                                          CommonResponse commonResponse,
+                                          String message
+            ) {
         log.error("LOG::UserServiceImpl saveOnboardingUsers Exception", exception);
         commonResponse.setStatus(StatusType.STATUS_FAIL);
         commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(),

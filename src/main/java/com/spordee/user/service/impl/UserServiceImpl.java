@@ -11,6 +11,7 @@ import com.spordee.user.response.common.MetaData;
 import com.spordee.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -31,8 +32,8 @@ public class UserServiceImpl implements UserService {
                                                     CommonResponse commonResponse) {
         log.info("LOG:: UserServiceImpl saveOnboardingUsers");
         PrimaryUserDetails primaryUserDetails = savePrimaryUserDetailsFromDto(initialUserSaveRequestDto);
-
-        return Mono.just(primaryUserDetails).map(primaryUserDataRepository::insert).map(savedPrimaryUserDetails -> {
+        PrimaryUserDetails save = primaryUserDataRepository.save(primaryUserDetails);
+        return Mono.just(save).map(savedPrimaryUserDetails -> {
             commonResponse.setData(savedPrimaryUserDetails);
             commonResponse.setStatus(StatusType.STATUS_SUCCESS);
             commonResponse.setMeta(new MetaData(false, CommonMessages.REQUEST_SUCCESS, CODE_SUCCESS.getCode(),
@@ -40,7 +41,14 @@ public class UserServiceImpl implements UserService {
             log.debug("LOG:: UserServiceImpl saveOnboardingUsers {} save Success ",
                     savedPrimaryUserDetails.getUserName());
             return commonResponse;
-        }).onErrorResume(exception -> handleExceptionRootReactive(exception, commonResponse));
+        }).onErrorResume(exception -> handleExceptionRootReactive(
+                CommonMessages.INTERNAL_SERVER_ERROR,
+                StatusType.STATUS_FAIL,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                exception,
+                commonResponse,
+                "Error In Internal Server"
+                ));
     }
 
 

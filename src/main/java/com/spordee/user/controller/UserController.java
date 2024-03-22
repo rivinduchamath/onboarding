@@ -67,18 +67,23 @@ public class UserController {
     @PostMapping("${api.class.method}")
     public Mono<CommonResponse> saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
                                                     Principal principal) {
+        log.info("LOG::UserController saveOnboardingUsers");
         return Mono.justOrEmpty(principal)
                 .flatMap(user -> {
                     String userName = user.getName();
                     initialUserSaveRequestDto.setUserName(userName);
-                    return userService.saveOnboardingUsers(initialUserSaveRequestDto, new CommonResponse());
+                    Mono<CommonResponse> commonResponseMono = userService.saveOnboardingUsers(initialUserSaveRequestDto, new CommonResponse());
+                    log.debug("LOG::UserController saveOnboardingUsers user name {} Save Success", userName);
+                    return commonResponseMono;
                 })
                 .onErrorResume(exception -> {
+                    log.error("LOG::UserController saveOnboardingUsers user Save Exception "+
+                    "(first Name = {})", initialUserSaveRequestDto.getFirstName());
                     CommonResponse commonResponse = new CommonResponse();
                     commonResponse.setData(exception.getMessage());
                     commonResponse.setStatus(StatusType.STATUS_FAIL);
-                    commonResponse.setMeta(new MetaData(true, CommonMessages.FORBIDDEN_ACCESS, HttpStatus.FORBIDDEN.value(),
-                            "Security Error"));
+                    commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            "System Error"));
                     return Mono.just(commonResponse);
                 });
     }
