@@ -76,7 +76,6 @@ public class UserController {
     public Mono<CommonResponse> saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
                                                     Principal principal) {
         log.info("LOG::UserController saveOnboardingUsers");
-        System.out.println(principal);
         AtomicReference<String> deviceId = new AtomicReference<>("");
         AtomicReference<String> device = new AtomicReference<>("");
         return  Mono.justOrEmpty(principal)
