@@ -3,6 +3,7 @@ package com.spordee.user.entity.primaryUserData;
 
 import com.spordee.user.dto.objects.UserSportsDto;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
+import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.enums.Gender;
 import com.spordee.user.enums.Sport;
 import com.spordee.user.enums.UserStatus;
@@ -18,6 +19,7 @@ import java.util.Set;
 @Setter
 @Getter
 @AllArgsConstructor
+@ToString
 @Document(collation = "primary_user_details")
 @NoArgsConstructor
 @Builder
@@ -54,6 +56,8 @@ public class PrimaryUserDetails {
     private List<UserImages> userImage;
     @Field("user_email")
     private String userEmail;
+    @DBRef
+    private UserSports userSports;
     private String favClubTeam;
     private String favPlayer;
     private Sport favSport;

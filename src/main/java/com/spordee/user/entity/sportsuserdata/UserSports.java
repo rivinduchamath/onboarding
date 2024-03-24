@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @AllArgsConstructor
 @Builder
+@ToString
 @NoArgsConstructor
 @Document("user_sports")
 public class UserSports {
@@ -18,23 +19,23 @@ public class UserSports {
     @Id
     @Field("user_name")
     private String userName;
-    @DBRef(lazy = true)
+    // @DBRef(lazy = true)
     @Field("soccer")
     private Soccer soccer;
-    @DBRef
+    // @DBRef
     private Basketball basketball;
-    @DBRef
+    // @DBRef
     private Cricket cricket;
-    @DBRef
+    // @DBRef
     @Field("american_football")
     private AmericanFootball americanFootball;
-    @DBRef
+    // @DBRef
     @Field("hockey")
     private IceHockey hockey;
-    @DBRef
+    // @DBRef
     @Field("baseball")
     private Baseball baseball;
-    @DBRef
+    // @DBRef
     @Field("rugby")
     private Rugby rugby;
 

@@ -1,9 +1,8 @@
 package com.spordee.user.controller;
 
 import com.spordee.user.configurations.Entity.SpordUser;
-import com.spordee.user.configurations.Request.SignUpRequest;
+import com.spordee.user.configurations.Request.SignUpDto;
 import com.spordee.user.dto.InitialUserSaveRequestDto;
-import com.spordee.user.enums.AuthProvider;
 import com.spordee.user.enums.CommonMessages;
 import com.spordee.user.enums.Device;
 import com.spordee.user.enums.StatusType;
@@ -11,7 +10,6 @@ import com.spordee.user.response.common.CommonResponse;
 import com.spordee.user.response.common.MetaData;
 import com.spordee.user.service.UserService;
 
-import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.print.attribute.standard.Media;
 import java.security.Principal;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -72,52 +69,54 @@ public class UserController {
 //        return commonResponse;
 //    }
 
+
     @PostMapping("${api.class.method}")
     public Mono<CommonResponse> saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
                                                     Principal principal) {
         log.info("LOG::UserController saveOnboardingUsers");
         AtomicReference<String> deviceId = new AtomicReference<>("");
         AtomicReference<String> device = new AtomicReference<>("");
-        return  Mono.justOrEmpty(principal)
+        // save data into database -> PimraryUserDetails
+        Mono<CommonResponse> monoResponse =  userService.saveOnboardingUsers(initialUserSaveRequestDto,new CommonResponse());
+
+
+        return Mono.justOrEmpty(principal)
                 .flatMap(user -> {
-                        if(user instanceof UsernamePasswordAuthenticationToken){
+                    if (user instanceof UsernamePasswordAuthenticationToken) {
                         SpordUser spordUser = (SpordUser) ((UsernamePasswordAuthenticationToken) user).getPrincipal();
                         deviceId.set(spordUser.getDeviceId());
                         device.set(spordUser.getDevice());
-                        SignUpRequest signUpRequest = SignUpRequest.builder()
+                        SignUpDto signUpRequest = SignUpDto.builder()
                                 .username(principal.getName())
                                 .device(Device.valueOf(device.get()))
                                 .deviceId(deviceId.get())
                                 .role(initialUserSaveRequestDto.getRegistrationType())
                                 .build();
 
-                        CommonResponse common = new  CommonResponse();
+                        System.out.println("SINGUP DTO : " + signUpRequest);
 
-                           webClient.post()
-                                   .uri("/auth/v1/onboarding")
-                                   .contentType(MediaType.APPLICATION_JSON)
-                                   .body(BodyInserters.fromValue(signUpRequest))
-                                   .retrieve()
-                                   .bodyToFlux(CommonResponse.class)
-                                   .flatMap(res -> {
-
-                                       common.setMeta(res.getMeta());
-                                       common.setStatus(res.getStatus());
-                                       common.setData(res.getData());
-                                       return Mono.just(common);
-                                   });
-
-                        System.out.println("COMMON  : :  : : "+common);
-
+                        return webClient.post()
+                                .uri("/auth/v1/onboarding")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(BodyInserters.fromValue(signUpRequest))
+                                .retrieve()
+                                .bodyToMono(CommonResponse.class)
+                                .flatMap(authResponse ->{
+                                    CommonResponse common = new CommonResponse();
+                                    common.setMeta(authResponse.getMeta());
+                                    common.setStatus(authResponse.getStatus());
+                                    common.setData(authResponse.getData());
+                                    return Mono.just(common);
+                                });
                     } else {
                         // Handle unexpected principal type
                         log.error("Unexpected principal type: {}", user.getClass());
+                        return Mono.error(new RuntimeException("Unexpected principal type"));
                     }
-                    return userService.saveOnboardingUsers(initialUserSaveRequestDto, new CommonResponse());
                 })
                 .onErrorResume(exception -> {
-                    log.error("LOG::UserController saveOnboardingUsers user Save Exception "+
-                    "(first Name = {})", initialUserSaveRequestDto.getFirstName());
+                    log.error("LOG::UserController saveOnboardingUsers user Save Exception " +
+                            "(first Name = {})", initialUserSaveRequestDto.getFirstName());
                     CommonResponse commonResponse = new CommonResponse();
                     commonResponse.setData(exception.getMessage());
                     commonResponse.setStatus(StatusType.STATUS_FAIL);

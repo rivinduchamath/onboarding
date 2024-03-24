@@ -4,6 +4,7 @@ package com.spordee.user.service.impl;
 import com.spordee.user.dto.InitialUserSaveRequestDto;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.sportsuserdata.UserSports;
+import com.spordee.user.entity.sportsuserdata.cascadetables.sports.*;
 import com.spordee.user.enums.CommonMessages;
 import com.spordee.user.enums.StatusType;
 import com.spordee.user.repository.PrimaryUserDataRepository;
@@ -36,17 +37,19 @@ public class UserServiceImpl implements UserService {
         log.info("LOG:: UserServiceImpl saveOnboardingUsers");
         PrimaryUserDetails primaryUserDetails = savePrimaryUserDetailsFromDto(initialUserSaveRequestDto);
         if(initialUserSaveRequestDto.getUserSportsDtos() !=null){
-            UserSports userSports =  UserSports.builder()
-                    .rugby(initialUserSaveRequestDto.getUserSportsDtos().getRugby())
-                    .baseball(initialUserSaveRequestDto.getUserSportsDtos().getBaseball())
-                    .americanFootball(initialUserSaveRequestDto.getUserSportsDtos().getAmericanFootball())
-                    .hockey(initialUserSaveRequestDto.getUserSportsDtos().getIceHockey())
-                    .soccer(initialUserSaveRequestDto.getUserSportsDtos().getSoccer())
-                    .cricket(initialUserSaveRequestDto.getUserSportsDtos().getCricket())
-                    .basketball(initialUserSaveRequestDto.getUserSportsDtos().getBasketball())
-                    .createdDate(String.valueOf(getCurrentEpochTimeInSec()))
-                    .build();
-            sportsRepository.save(userSports);
+            UserSports userSports = UserSports.builder()
+                            .soccer(initialUserSaveRequestDto.getUserSportsDtos().getSoccer())
+                            .americanFootball(initialUserSaveRequestDto.getUserSportsDtos().getAmericanFootball())
+                            .rugby(initialUserSaveRequestDto.getUserSportsDtos().getRugby())
+                            .baseball(initialUserSaveRequestDto.getUserSportsDtos().getBaseball())
+                            .cricket(initialUserSaveRequestDto.getUserSportsDtos().getCricket())
+                            .hockey(initialUserSaveRequestDto.getUserSportsDtos().getIceHockey())
+                            .basketball(initialUserSaveRequestDto.getUserSportsDtos().getBasketball())
+                            .build();
+
+            System.out.println("USER SPORTS : "+ userSports);
+            UserSports sports =  sportsRepository.save(userSports);
+            primaryUserDetails.setUserSports(sports);
         }
         PrimaryUserDetails save = primaryUserDataRepository.save(primaryUserDetails);
         return Mono.just(save).map(savedPrimaryUserDetails -> {

@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @Getter
 @Document("basketball")
+@ToString
 public class Basketball {
     @Id
     private String id;

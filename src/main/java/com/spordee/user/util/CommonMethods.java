@@ -17,8 +17,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.spordee.user.enums.RegistrationType.FAN;
-import static com.spordee.user.enums.RegistrationType.PLAYER;
+import static com.spordee.user.enums.RegistrationType.REGISTRATION_TYPE_FAN;
+import static com.spordee.user.enums.RegistrationType.REGISTRATION_TYPE_PLAYER;
 
 @Component
 public  class CommonMethods {
@@ -68,12 +68,12 @@ public  class CommonMethods {
                 .userImage(saveUserImagesFromDto(initialUserSaveRequestDto.getUserImagesDtos(), currentTime))
                 .roles(Collections.singletonList(initialUserSaveRequestDto.getRegistrationType().toString()));
 
-        if(initialUserSaveRequestDto.getRegistrationType().equals(PLAYER)){
+        if(initialUserSaveRequestDto.getRegistrationType().equals(REGISTRATION_TYPE_PLAYER)){
 //            primaryUserDetails.sport(initialUserSaveRequestDto.getUserSportsDtos())
                     primaryUserDetails.gender(initialUserSaveRequestDto.getGender());
 
 
-        }else if(initialUserSaveRequestDto.getRegistrationType().equals(FAN)){
+        }else if(initialUserSaveRequestDto.getRegistrationType().equals(REGISTRATION_TYPE_FAN)){
             primaryUserDetails.favPlayer(initialUserSaveRequestDto.getFavPlayer())
                     .favSport(initialUserSaveRequestDto.getFavSport())
                     .secondaryFavSports(initialUserSaveRequestDto.getSecondaryFavSports())

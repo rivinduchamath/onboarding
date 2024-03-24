@@ -1,6 +1,5 @@
 package com.spordee.user.configurations.Request;
 
-import com.spordee.user.enums.AuthProvider;
 import com.spordee.user.enums.Device;
 import com.spordee.user.enums.RegistrationType;
 import lombok.*;
@@ -12,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
-public class SignUpRequest {
+public class SignUpDto {
     @NonNull
     private String username;
     @NonNull

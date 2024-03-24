@@ -14,8 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @Document("cricket")
 public class Cricket {
-    @Id
-    private String id;
     @Field("bowlingStyle")
     private BowlingStyle bowlingStyle;
     private BatsCricket bats;
