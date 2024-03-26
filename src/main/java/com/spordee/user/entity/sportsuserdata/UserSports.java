@@ -19,26 +19,18 @@ public class UserSports {
     @Id
     @Field("user_name")
     private String userName;
-    // @DBRef(lazy = true)
     @Field("soccer")
     private Soccer soccer;
-    // @DBRef
     private Basketball basketball;
-    // @DBRef
     private Cricket cricket;
-    // @DBRef
     @Field("american_football")
     private AmericanFootball americanFootball;
-    // @DBRef
     @Field("hockey")
     private IceHockey hockey;
-    // @DBRef
     @Field("baseball")
     private Baseball baseball;
-    // @DBRef
     @Field("rugby")
     private Rugby rugby;
-
     @Field("created_date")
     private String createdDate; // Epoch Time
     @Field("updated_date")

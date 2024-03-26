@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PrimaryUserDataRepository extends MongoRepository<PrimaryUserDetails, String> {
 
-    ObservationFilter findByUserName(String username);
+    PrimaryUserDetails findByUserName(String username);
 }

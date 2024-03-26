@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SportsRepository  extends MongoRepository<UserSports,String> {
+    UserSports findByUserName(String username);
 }

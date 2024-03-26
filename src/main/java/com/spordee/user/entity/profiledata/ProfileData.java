@@ -1,13 +1,7 @@
 package com.spordee.user.entity.profiledata;
 
-import com.spordee.user.entity.profiledata.cascadetables.Bookmarks;
-import com.spordee.user.entity.profiledata.cascadetables.UserAddress;
-import com.spordee.user.entity.profiledata.cascadetables.UserMobileNumber;
-import com.spordee.user.entity.profiledata.cascadetables.UserVideo;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.spordee.user.entity.profiledata.cascadetables.*;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,12 +9,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @Document(collation = "profile_data")
 @NoArgsConstructor
+@Builder
 public class ProfileData {
     @Id
     private String id;
@@ -30,11 +26,23 @@ public class ProfileData {
     private String shortDescription;
     @Field("user_name")
     private String userName;
+    private String email;
+    private String name;
+    private String birthDay;
+    @Field("phone_number")
+    private String phoneNumber;
+    @Field("birth_country")
     private String birthCountry;
+    private String citizenShip;
     private String birthCity;
+    @Field("country_of_residence")
+    private String countryOfResidence;
+    @Field("city_of_residence")
+    private String cityOfResidence;
+    private Set<String> languages;
     private String height;
     private String weight;
-    private List<String> skills;
+    private Set<String> skills;
     private Map<String, String> endorsement;
     private Map<String, String> recommendations;
     private Map<String, String> stats;
@@ -49,7 +57,7 @@ public class ProfileData {
     private List<UserAddress> userAddress;
     @DBRef
     @Field("user_experience")
-    private List<UserMobileNumber> userExperience;
+    private List<UserExperience> userExperience;
     @DBRef
     @Field("user_videos")
     private List<UserVideo> userVideos;

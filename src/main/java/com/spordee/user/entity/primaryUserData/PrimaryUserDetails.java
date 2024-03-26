@@ -6,6 +6,7 @@ import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.enums.Gender;
 import com.spordee.user.enums.Sport;
+import com.spordee.user.enums.SportsGender;
 import com.spordee.user.enums.UserStatus;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -31,7 +32,10 @@ public class PrimaryUserDetails {
     private String firstName;
     @Field("last_name")
     private String lastName;
-    private Gender gender;
+    private SportsGender sportsGender;
+    private String phoneNumber;
+    @Field("country_code")
+    private String countryCode;
     private String country;
     private String city;
     @Field("is_premium")
@@ -64,7 +68,6 @@ public class PrimaryUserDetails {
     private Set<Sport> secondaryFavSports;
     private String favAllTimePlayer;
     private String favNationalTeam;
-    private String weight;
-    private String height;
+    private Set<String> languages;
 
 }

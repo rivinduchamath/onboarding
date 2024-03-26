@@ -1,13 +1,20 @@
 package com.spordee.user.util;
 
 import com.spordee.user.dto.InitialUserSaveRequestDto;
+import com.spordee.user.dto.UpdateUserRequestDto;
 import com.spordee.user.dto.objects.UserImagesDto;
+import com.spordee.user.dto.objects.UserSportsDto;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
+import com.spordee.user.entity.profiledata.ProfileData;
+import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.enums.UserStatus;
 import com.spordee.user.exceptions.OAuth2AuthenticationProcessingException;
+import io.micrometer.observation.ObservationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import reactor.core.publisher.Mono;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -35,6 +42,19 @@ public  class CommonMethods {
 
 
 
+    public static UserSports changeAndUpdateToUserSports(UserSportsDto userSportsDto,UserSports userSports){
+        userSports.setAmericanFootball(userSportsDto.getAmericanFootball());
+        userSports.setBaseball(userSportsDto.getBaseball());
+        userSports.setBasketball(userSportsDto.getBasketball());
+        userSports.setHockey(userSportsDto.getIceHockey());
+        userSports.setCricket(userSportsDto.getCricket());
+        userSports.setRugby(userSportsDto.getRugby());
+        userSports.setSoccer(userSportsDto.getSoccer());
+        userSports.setUpdatedDate(String.valueOf(getCurrentEpochTimeInSec()));
+        return userSports;
+    }
+
+
     public static List<UserImages> saveUserImagesFromDto(List<UserImagesDto> userImagesDtoList, long currentTime) {
         if (!userImagesDtoList.isEmpty()) {
             return userImagesDtoList.stream()
@@ -59,18 +79,17 @@ public  class CommonMethods {
                 .lastName(initialUserSaveRequestDto.getLastName())
                 .city(initialUserSaveRequestDto.getCity())
                 .country(initialUserSaveRequestDto.getCountry())
-                .height(initialUserSaveRequestDto.getHeight())
-                .weight(initialUserSaveRequestDto.getWeight())
                 .userStatus(UserStatus.ACTIVE)
                 .createdDate(currentTime)
                 .birthDay(initialUserSaveRequestDto.getBirthDay())
                 .userEmail(initialUserSaveRequestDto.getUserEmail())
+                .countryCode(initialUserSaveRequestDto.getCountryCode())
                 .userImage(saveUserImagesFromDto(initialUserSaveRequestDto.getUserImagesDtos(), currentTime))
                 .roles(Collections.singletonList(initialUserSaveRequestDto.getRegistrationType().toString()));
 
         if(initialUserSaveRequestDto.getRegistrationType().equals(REGISTRATION_TYPE_PLAYER)){
 //            primaryUserDetails.sport(initialUserSaveRequestDto.getUserSportsDtos())
-                    primaryUserDetails.gender(initialUserSaveRequestDto.getGender());
+                    primaryUserDetails.sportsGender(initialUserSaveRequestDto.getSportsGender());
 
 
         }else if(initialUserSaveRequestDto.getRegistrationType().equals(REGISTRATION_TYPE_FAN)){
@@ -82,6 +101,47 @@ public  class CommonMethods {
                     .favAllTimePlayer(initialUserSaveRequestDto.getFavAllTimePlayer());
         }
         return primaryUserDetails.build();
+    }
+
+    public static ProfileData saveProfileDataFromDto(InitialUserSaveRequestDto initialUserSaveRequestDto){
+        return  ProfileData.builder()
+                .userName(initialUserSaveRequestDto.getUserName())
+                .name(initialUserSaveRequestDto.getFirstName())
+                .birthCountry(initialUserSaveRequestDto.getBirthCountry())
+                .birthCity(initialUserSaveRequestDto.getBirthCity())
+                .weight(initialUserSaveRequestDto.getWeight())
+                .height(initialUserSaveRequestDto.getHeight())
+                .createdDate(getCurrentEpochTimeInSec())
+                .build();
+
+    }
+
+
+    public static PrimaryUserDetails updatePersonal(UpdateUserRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserDetails){
+        primaryUserDetails.setUserEmail(StringUtils.hasText(updateUserRequestDto.getEmail()) ? updateUserRequestDto.getEmail() : primaryUserDetails.getUserEmail());
+        primaryUserDetails.setFirstName(StringUtils.hasText(updateUserRequestDto.getName()) ? updateUserRequestDto.getName() : primaryUserDetails.getFirstName());
+        primaryUserDetails.setBirthDay(Long.valueOf(updateUserRequestDto.getDateOfBirth()) != null ? updateUserRequestDto.getDateOfBirth() : primaryUserDetails.getBirthDay());
+        primaryUserDetails.setPhoneNumber(StringUtils.hasText(updateUserRequestDto.getPhoneNumber()) ? updateUserRequestDto.getPhoneNumber() : primaryUserDetails.getPhoneNumber());
+        primaryUserDetails.setCountry(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : primaryUserDetails.getCountry());
+        primaryUserDetails.setLanguages(!updateUserRequestDto.getLanguages().isEmpty() ? updateUserRequestDto.getLanguages() : primaryUserDetails.getLanguages());
+        primaryUserDetails.setUpdatedDate(getCurrentEpochTimeInSec());
+        return primaryUserDetails;
+    }
+
+    public static ProfileData updatePersonalData(UpdateUserRequestDto updateUserRequestDto, ProfileData profileData){
+        profileData.setEmail(StringUtils.hasText(updateUserRequestDto.getEmail()) ? updateUserRequestDto.getEmail() : profileData.getEmail());
+        profileData.setName(StringUtils.hasText(updateUserRequestDto.getName()) ? updateUserRequestDto.getName() : profileData.getName());
+        profileData.setBirthDay(Long.valueOf(updateUserRequestDto.getDateOfBirth()) != null ? String.valueOf(updateUserRequestDto.getDateOfBirth()) : profileData.getBirthDay());
+        profileData.setPhoneNumber(StringUtils.hasText(updateUserRequestDto.getPhoneNumber()) ? updateUserRequestDto.getPhoneNumber() : profileData.getPhoneNumber());
+        profileData.setCitizenShip(StringUtils.hasText(updateUserRequestDto.getCitizenship()) ? updateUserRequestDto.getCitizenship() : profileData.getCitizenShip());
+        profileData.setCountryOfResidence(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : profileData.getCountryOfResidence());
+        profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCountryOfBirth()) ? updateUserRequestDto.getCountryOfBirth() : profileData.getBirthCountry());
+        profileData.setBirthCity(StringUtils.hasText(updateUserRequestDto.getCityOfBirth()) ? updateUserRequestDto.getCityOfBirth() : profileData.getBirthCity());
+        profileData.setCityOfResidence(StringUtils.hasText(updateUserRequestDto.getCityOfResidence()) ? updateUserRequestDto.getCityOfResidence() : profileData.getCityOfResidence());
+        profileData.setCountryOfResidence(StringUtils.hasText(updateUserRequestDto.getCountryOfResidence()) ? updateUserRequestDto.getEmail() : profileData.getCountryOfResidence());
+        profileData.setLanguages(!updateUserRequestDto.getLanguages().isEmpty() ? updateUserRequestDto.getLanguages() : profileData.getLanguages());
+        profileData.setUpdatedDate(getCurrentEpochTimeInSec());
+        return profileData;
     }
 
 

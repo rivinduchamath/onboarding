@@ -3,6 +3,7 @@ package com.spordee.user.controller;
 import com.spordee.user.configurations.Entity.SpordUser;
 import com.spordee.user.configurations.Request.SignUpDto;
 import com.spordee.user.dto.InitialUserSaveRequestDto;
+import com.spordee.user.dto.UpdateUserRequestDto;
 import com.spordee.user.enums.CommonMessages;
 import com.spordee.user.enums.Device;
 import com.spordee.user.enums.StatusType;
@@ -76,7 +77,16 @@ public class UserController {
         AtomicReference<String> deviceId = new AtomicReference<>("");
         AtomicReference<String> device = new AtomicReference<>("");
         // save data into database -> PimraryUserDetails
-        Mono<CommonResponse> monoResponse =  userService.saveOnboardingUsers(initialUserSaveRequestDto,new CommonResponse());
+        Mono<CommonResponse> monoResponse =  userService.saveOnboardingUsers(initialUserSaveRequestDto,new CommonResponse(), principal.getName());
+
+        if(monoResponse == null){
+            CommonResponse commonResponse = new CommonResponse();
+            commonResponse.setMeta(new MetaData(true,CommonMessages.INTERNAL_SERVER_ERROR,500,"Issue is in save the details in database"));
+            commonResponse.setData("There is an issue in saving the details in database");
+            commonResponse.setStatus(StatusType.STATUS_FAIL);
+            return Mono.just(commonResponse);
+        }
+
 
 
         return Mono.justOrEmpty(principal)
@@ -92,8 +102,6 @@ public class UserController {
                                 .authProvider(((SpordUser) ((UsernamePasswordAuthenticationToken) user).getPrincipal()).getAuthProvider())
                                 .role(initialUserSaveRequestDto.getRegistrationType())
                                 .build();
-
-                        System.out.println("SINGUP DTO : " + signUpRequest);
 
                         return webClient.patch()
                                 .uri("/auth/v1/onboarding")
@@ -126,6 +134,61 @@ public class UserController {
                     return Mono.just(commonResponse);
                 });
     }
+
+
+    @PatchMapping("/update/personalDetails")
+    public Mono<CommonResponse> updatePersonalDetails(UpdateUserRequestDto updateUserRequestDto ,Principal principal){
+        log.info("Update Personal details for user Id {}",updateUserRequestDto.getName());
+        String username = principal.getName();
+
+        return userService.updatePersonalDetails(updateUserRequestDto, username, new CommonResponse())
+                .onErrorResume(exception -> {
+                    log.error("Error occurred while updating personal details for user {}", username, exception);
+                    CommonResponse errorResponse = new CommonResponse();
+                    errorResponse.setStatus(StatusType.STATUS_FAIL);
+                    errorResponse.setData("");
+                    errorResponse.setMeta(new MetaData(false, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
+                    return Mono.just(errorResponse);
+                });
+
+    }
+
+    @PatchMapping("/update/specs")
+    public Mono<CommonResponse> updateSpecs(UpdateUserRequestDto updateUserRequestDto ,Principal principal){
+        log.info("Update Personal details for user Id {}",updateUserRequestDto.getName());
+        String username = principal.getName();
+
+        return userService.updateHeightWeightAndSports(updateUserRequestDto, username, new CommonResponse())
+                .onErrorResume(exception -> {
+                    log.error("Error occurred while updating personal details for user {}", username, exception);
+                    CommonResponse errorResponse = new CommonResponse();
+                    errorResponse.setStatus(StatusType.STATUS_FAIL);
+                    errorResponse.setData(exception.getMessage());
+                    errorResponse.setMeta(new MetaData(false, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
+                    return Mono.just(errorResponse);
+                });
+
+    }
+
+    @PatchMapping("/update/skills")
+    public Mono<CommonResponse> updateSkills(UpdateUserRequestDto updateUserRequestDto ,Principal principal){
+        log.info("Update Personal details for user Id {}",updateUserRequestDto.getName());
+        String username = principal.getName();
+
+        return userService.updateHeightWeightAndSports(updateUserRequestDto, username, new CommonResponse())
+                .onErrorResume(exception -> {
+                    log.error("Error occurred while updating personal details for user {}", username, exception);
+                    CommonResponse errorResponse = new CommonResponse();
+                    errorResponse.setStatus(StatusType.STATUS_FAIL);
+                    errorResponse.setData(exception.getMessage());
+                    errorResponse.setMeta(new MetaData(false, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
+                    return Mono.just(errorResponse);
+                });
+
+    }
+
+
+
 
 
 }
