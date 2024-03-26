@@ -8,10 +8,4 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
     Mono<CommonResponse> saveOnboardingUsers(InitialUserSaveRequestDto initialUserSaveRequestDto, CommonResponse commonResponse,String username);
-
-    Mono<CommonResponse> updatePersonalDetails(UpdateUserRequestDto updateUserRequestDto,String username,CommonResponse commonResponse);
-    Mono<CommonResponse> updateHeightWeightAndSports(UpdateUserRequestDto updateUserRequestDto,String username,CommonResponse commonResponse);
-    Mono<CommonResponse> updateSkills(UpdateUserRequestDto updateUserRequestDto,String username,CommonResponse commonResponse);
-
-
 }

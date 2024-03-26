@@ -35,41 +35,6 @@ public class UserController {
     private final WebClient webClient;
 
 
-//    @PostMapping("${api.class.method}")
-//    public CommonResponse saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
-//                                              Principal principal, HttpServletResponse httpServletResponse) {
-//        log.info("LOG::UserController saveOnboardingUsers");
-//        CommonResponse commonResponse = new CommonResponse();
-//        try {
-//            if (principal.getName().isEmpty()) {
-//                log.error("LOG::UserController saveOnboardingUsers User Cannot Found Inside the Token " +
-//                        "(first Name = {})", initialUserSaveRequestDto.getFirstName());
-//                httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-//                commonResponse.setData("Authentication error. Cannot Find User Name");
-//                commonResponse.setStatus(StatusType.STATUS_FAIL);
-//                commonResponse.setMeta(new MetaData(true, CommonMessages.REQUEST_FAIL, CODE_FORBIDDEN.getCode(),
-//                        "Forbidden Access"));
-//            } else {
-//                String userName = principal.getName();
-//                initialUserSaveRequestDto.setUserName(userName);
-//                commonResponse = userService.saveOnboardingUsers(initialUserSaveRequestDto, commonResponse,
-//                        httpServletResponse);
-//                httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-//                log.debug("LOG::UserController saveOnboardingUsers user name {} Save Success", userName);
-//            }
-//        } catch (Exception e) {
-//            log.error("LOG::UserController saveOnboardingUsers user Save Exception "+
-//                    "(first Name = {})", initialUserSaveRequestDto.getFirstName());
-//            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-//            commonResponse.setData(e.getMessage());
-//            commonResponse.setStatus(StatusType.STATUS_FAIL);
-//            commonResponse.setMeta(new MetaData(true, CommonMessages.FORBIDDEN_ACCESS, CODE_FORBIDDEN.getCode(),
-//                    "Security Error"));
-//        }
-//        return commonResponse;
-//    }
-
-
     @PostMapping("${api.class.method}")
     public Mono<CommonResponse> saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
                                                     Principal principal, @RequestHeader("Authorization") String token) {
@@ -134,59 +99,6 @@ public class UserController {
                     return Mono.just(commonResponse);
                 });
     }
-
-
-    @PatchMapping("/update/personalDetails")
-    public Mono<CommonResponse> updatePersonalDetails(UpdateUserRequestDto updateUserRequestDto ,Principal principal){
-        log.info("Update Personal details for user Id {}",updateUserRequestDto.getName());
-        String username = principal.getName();
-
-        return userService.updatePersonalDetails(updateUserRequestDto, username, new CommonResponse())
-                .onErrorResume(exception -> {
-                    log.error("Error occurred while updating personal details for user {}", username, exception);
-                    CommonResponse errorResponse = new CommonResponse();
-                    errorResponse.setStatus(StatusType.STATUS_FAIL);
-                    errorResponse.setData("");
-                    errorResponse.setMeta(new MetaData(false, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
-                    return Mono.just(errorResponse);
-                });
-
-    }
-
-    @PatchMapping("/update/specs")
-    public Mono<CommonResponse> updateSpecs(UpdateUserRequestDto updateUserRequestDto ,Principal principal){
-        log.info("Update Personal details for user Id {}",updateUserRequestDto.getName());
-        String username = principal.getName();
-
-        return userService.updateHeightWeightAndSports(updateUserRequestDto, username, new CommonResponse())
-                .onErrorResume(exception -> {
-                    log.error("Error occurred while updating personal details for user {}", username, exception);
-                    CommonResponse errorResponse = new CommonResponse();
-                    errorResponse.setStatus(StatusType.STATUS_FAIL);
-                    errorResponse.setData(exception.getMessage());
-                    errorResponse.setMeta(new MetaData(false, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
-                    return Mono.just(errorResponse);
-                });
-
-    }
-
-    @PatchMapping("/update/skills")
-    public Mono<CommonResponse> updateSkills(UpdateUserRequestDto updateUserRequestDto ,Principal principal){
-        log.info("Update Personal details for user Id {}",updateUserRequestDto.getName());
-        String username = principal.getName();
-
-        return userService.updateHeightWeightAndSports(updateUserRequestDto, username, new CommonResponse())
-                .onErrorResume(exception -> {
-                    log.error("Error occurred while updating personal details for user {}", username, exception);
-                    CommonResponse errorResponse = new CommonResponse();
-                    errorResponse.setStatus(StatusType.STATUS_FAIL);
-                    errorResponse.setData(exception.getMessage());
-                    errorResponse.setMeta(new MetaData(false, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
-                    return Mono.just(errorResponse);
-                });
-
-    }
-
 
 
 

@@ -34,11 +34,12 @@ public class ProfileData {
     @Field("birth_country")
     private String birthCountry;
     private String citizenShip;
-    private String birthCity;
+    @Field("place_of_birth")
+    private String placeOfBirth;
     @Field("country_of_residence")
     private String countryOfResidence;
-    @Field("city_of_residence")
-    private String cityOfResidence;
+    @Field("place_of_residence")
+    private String placeOfResidence;
     private Set<String> languages;
     private String height;
     private String weight;

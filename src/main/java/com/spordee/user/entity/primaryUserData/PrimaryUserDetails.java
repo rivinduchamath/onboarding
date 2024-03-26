@@ -28,15 +28,24 @@ public class PrimaryUserDetails {
 
     @Id
     private String id;
-    @Field("first_name")
-    private String firstName;
-    @Field("last_name")
-    private String lastName;
-    private SportsGender sportsGender;
+    @Field("name")
+    private String name;
+    @Field("birth_day")
+    private long birthDay;
+    @Field("user_email")
+    private String userEmail;
+    @Field("phone_number")
     private String phoneNumber;
+    @Field("home_country")
+    private String homeCountry;
+    @Field("sports_gender")
+    private SportsGender sportsGender;
     @Field("country_code")
     private String countryCode;
-    private String country;
+    private Set<String> languages;
+
+
+
     private String city;
     @Field("is_premium")
     private boolean isPremium;
@@ -48,8 +57,7 @@ public class PrimaryUserDetails {
     private boolean openJob;
     @Field("is_verified")
     private boolean isVerified;
-    @Field("birth_day")
-    private long birthDay;
+
     @Field("created_date")
     private long createdDate;
     @Field("updated_date")
@@ -58,8 +66,7 @@ public class PrimaryUserDetails {
 //    @DBRef
     @Field("user_images")
     private List<UserImages> userImage;
-    @Field("user_email")
-    private String userEmail;
+
     @DBRef
     private UserSports userSports;
     private String favClubTeam;
@@ -68,6 +75,7 @@ public class PrimaryUserDetails {
     private Set<Sport> secondaryFavSports;
     private String favAllTimePlayer;
     private String favNationalTeam;
-    private Set<String> languages;
+
+
 
 }

@@ -4,6 +4,7 @@ import com.spordee.user.dto.InitialUserSaveRequestDto;
 import com.spordee.user.dto.UpdateUserRequestDto;
 import com.spordee.user.dto.objects.UserImagesDto;
 import com.spordee.user.dto.objects.UserSportsDto;
+import com.spordee.user.dto.request.PersonalInformationRequestDto;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.entity.profiledata.ProfileData;
@@ -75,10 +76,10 @@ public  class CommonMethods {
         PrimaryUserDetails.PrimaryUserDetailsBuilder primaryUserDetails = PrimaryUserDetails.builder()
                 .id(initialUserSaveRequestDto.getId())
                 .userName(initialUserSaveRequestDto.getUserName())
-                .firstName(initialUserSaveRequestDto.getFirstName())
-                .lastName(initialUserSaveRequestDto.getLastName())
+                .name(initialUserSaveRequestDto.getFirstName())
+                .name(initialUserSaveRequestDto.getLastName())
                 .city(initialUserSaveRequestDto.getCity())
-                .country(initialUserSaveRequestDto.getCountry())
+                .homeCountry(initialUserSaveRequestDto.getCountry())
                 .userStatus(UserStatus.ACTIVE)
                 .createdDate(currentTime)
                 .birthDay(initialUserSaveRequestDto.getBirthDay())
@@ -108,7 +109,7 @@ public  class CommonMethods {
                 .userName(initialUserSaveRequestDto.getUserName())
                 .name(initialUserSaveRequestDto.getFirstName())
                 .birthCountry(initialUserSaveRequestDto.getBirthCountry())
-                .birthCity(initialUserSaveRequestDto.getBirthCity())
+                .birthCountry(initialUserSaveRequestDto.getBirthCity())
                 .weight(initialUserSaveRequestDto.getWeight())
                 .height(initialUserSaveRequestDto.getHeight())
                 .createdDate(getCurrentEpochTimeInSec())
@@ -116,13 +117,26 @@ public  class CommonMethods {
 
     }
 
-
+    public static void updateProfileDataConditionally(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData) {
+        Optional.ofNullable(updateUserRequestDto.getName()).ifPresent(primaryUserData::setName);
+        Optional.ofNullable(updateUserRequestDto.getUserName()).ifPresent(primaryUserData::setUserName);
+        Optional.of(updateUserRequestDto.getBirthDay()).ifPresent(primaryUserData::setBirthDay);
+        Optional.ofNullable(updateUserRequestDto.getUserEmail()).ifPresent(primaryUserData::setUserEmail);
+        Optional.ofNullable(updateUserRequestDto.getPhoneNumber()).ifPresent(primaryUserData::setPhoneNumber);
+        Optional.ofNullable(updateUserRequestDto.getHomeCountry()).ifPresent(primaryUserData::setHomeCountry);
+        Optional.ofNullable(updateUserRequestDto.getLanguages()).ifPresent(primaryUserData::setLanguages);
+    }
+    public static void updateUserDetailsConditionally(PersonalInformationRequestDto updateUserRequestDto, ProfileData profileData) {
+        Optional.ofNullable(updateUserRequestDto.getPlaceOfResidence()).ifPresent(profileData::setPlaceOfResidence);
+        Optional.ofNullable(updateUserRequestDto.getCitizenship()).ifPresent(profileData::setCitizenShip);
+        Optional.ofNullable(updateUserRequestDto.getPlaceOfBirth()).ifPresent(profileData::setPlaceOfBirth);
+    }
     public static PrimaryUserDetails updatePersonal(UpdateUserRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserDetails){
         primaryUserDetails.setUserEmail(StringUtils.hasText(updateUserRequestDto.getEmail()) ? updateUserRequestDto.getEmail() : primaryUserDetails.getUserEmail());
-        primaryUserDetails.setFirstName(StringUtils.hasText(updateUserRequestDto.getName()) ? updateUserRequestDto.getName() : primaryUserDetails.getFirstName());
+        primaryUserDetails.setName(StringUtils.hasText(updateUserRequestDto.getName()) ? updateUserRequestDto.getName() : primaryUserDetails.getName());
         primaryUserDetails.setBirthDay(Long.valueOf(updateUserRequestDto.getDateOfBirth()) != null ? updateUserRequestDto.getDateOfBirth() : primaryUserDetails.getBirthDay());
         primaryUserDetails.setPhoneNumber(StringUtils.hasText(updateUserRequestDto.getPhoneNumber()) ? updateUserRequestDto.getPhoneNumber() : primaryUserDetails.getPhoneNumber());
-        primaryUserDetails.setCountry(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : primaryUserDetails.getCountry());
+        primaryUserDetails.setName(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : primaryUserDetails.getName());
         primaryUserDetails.setLanguages(!updateUserRequestDto.getLanguages().isEmpty() ? updateUserRequestDto.getLanguages() : primaryUserDetails.getLanguages());
         primaryUserDetails.setUpdatedDate(getCurrentEpochTimeInSec());
         return primaryUserDetails;
@@ -136,8 +150,8 @@ public  class CommonMethods {
         profileData.setCitizenShip(StringUtils.hasText(updateUserRequestDto.getCitizenship()) ? updateUserRequestDto.getCitizenship() : profileData.getCitizenShip());
         profileData.setCountryOfResidence(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : profileData.getCountryOfResidence());
         profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCountryOfBirth()) ? updateUserRequestDto.getCountryOfBirth() : profileData.getBirthCountry());
-        profileData.setBirthCity(StringUtils.hasText(updateUserRequestDto.getCityOfBirth()) ? updateUserRequestDto.getCityOfBirth() : profileData.getBirthCity());
-        profileData.setCityOfResidence(StringUtils.hasText(updateUserRequestDto.getCityOfResidence()) ? updateUserRequestDto.getCityOfResidence() : profileData.getCityOfResidence());
+        profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCityOfBirth()) ? updateUserRequestDto.getCityOfBirth() : profileData.getBirthCountry());
+        profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCityOfResidence()) ? updateUserRequestDto.getCityOfResidence() : profileData.getBirthCountry());
         profileData.setCountryOfResidence(StringUtils.hasText(updateUserRequestDto.getCountryOfResidence()) ? updateUserRequestDto.getEmail() : profileData.getCountryOfResidence());
         profileData.setLanguages(!updateUserRequestDto.getLanguages().isEmpty() ? updateUserRequestDto.getLanguages() : profileData.getLanguages());
         profileData.setUpdatedDate(getCurrentEpochTimeInSec());
