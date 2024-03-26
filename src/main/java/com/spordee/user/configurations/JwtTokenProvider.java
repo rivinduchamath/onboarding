@@ -1,6 +1,7 @@
 package com.spordee.user.configurations;
 
 import com.spordee.user.configurations.Entity.SpordUser;
+import com.spordee.user.enums.AuthProvider;
 import com.spordee.user.tokenmapper.objects.Role;
 import com.spordee.user.util.AttributesCommon;
 import io.jsonwebtoken.*;
@@ -30,6 +31,7 @@ public class JwtTokenProvider {
     private static final String AUTHORITIES_KEY = "roles";
     private static final String DEVICE_ID = "JWT_DEVICE_ID";
     private static final String DEVICE = "DEVICE_NAME";
+    private static final String AUTH_PROVIDER = "AUTH_PROVIDER";
     private static final String AUTH_ID = "sub";
 
 
@@ -52,12 +54,13 @@ public class JwtTokenProvider {
         Object authoritiesClaim = extractRolesFromToken(token);
         String deviceId = (String) header.get(DEVICE_ID);
         String device = (String)header.get(DEVICE);
+        String authProvider = (String) header.get(AUTH_PROVIDER);
 
         Collection<? extends GrantedAuthority> authorities = authoritiesClaim == null
                 ? AuthorityUtils.NO_AUTHORITIES
                 : AuthorityUtils.commaSeparatedStringToAuthorityList(authoritiesClaim.toString());
 
-        SpordUser principal = new SpordUser(claims.getSubject(), "", authorities,deviceId,device);
+        SpordUser principal = new SpordUser(claims.getSubject(), "", authorities,deviceId,device,AuthProvider.valueOf(authProvider));
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 

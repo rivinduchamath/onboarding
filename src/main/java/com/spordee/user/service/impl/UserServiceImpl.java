@@ -6,6 +6,7 @@ import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.entity.sportsuserdata.cascadetables.sports.*;
 import com.spordee.user.enums.CommonMessages;
+import com.spordee.user.enums.RegistrationType;
 import com.spordee.user.enums.StatusType;
 import com.spordee.user.repository.PrimaryUserDataRepository;
 import com.spordee.user.repository.SportsRepository;
@@ -18,8 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 import static com.spordee.user.exceptions.GlobalExceptionHandler.handleExceptionRootReactive;
 import static com.spordee.user.util.CommonMethods.*;
+import static com.spordee.user.util.StatusCodes.CODE_INTERNAL_SERVER_ERROR;
 import static com.spordee.user.util.StatusCodes.CODE_SUCCESS;
 
 @Slf4j
@@ -36,7 +40,7 @@ public class UserServiceImpl implements UserService {
                                                     CommonResponse commonResponse) {
         log.info("LOG:: UserServiceImpl saveOnboardingUsers");
         PrimaryUserDetails primaryUserDetails = savePrimaryUserDetailsFromDto(initialUserSaveRequestDto);
-        if(initialUserSaveRequestDto.getUserSportsDtos() !=null){
+        if(initialUserSaveRequestDto.getUserSportsDtos() !=null && initialUserSaveRequestDto.getRegistrationType().equals(RegistrationType.REGISTRATION_TYPE_PLAYER)){
             UserSports userSports = UserSports.builder()
                             .soccer(initialUserSaveRequestDto.getUserSportsDtos().getSoccer())
                             .americanFootball(initialUserSaveRequestDto.getUserSportsDtos().getAmericanFootball())
@@ -49,6 +53,7 @@ public class UserServiceImpl implements UserService {
 
             System.out.println("USER SPORTS : "+ userSports);
             UserSports sports =  sportsRepository.save(userSports);
+            System.out.println("SPORTS : "+sports);
             primaryUserDetails.setUserSports(sports);
         }
         PrimaryUserDetails save = primaryUserDataRepository.save(primaryUserDetails);
@@ -70,6 +75,5 @@ public class UserServiceImpl implements UserService {
                 "Error In Internal Server"
                 ));
     }
-
 
 }

@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
     Mono<CommonResponse> saveOnboardingUsers(InitialUserSaveRequestDto initialUserSaveRequestDto, CommonResponse commonResponse);
+
 }

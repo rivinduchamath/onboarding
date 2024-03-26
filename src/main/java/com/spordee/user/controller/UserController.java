@@ -9,7 +9,6 @@ import com.spordee.user.enums.StatusType;
 import com.spordee.user.response.common.CommonResponse;
 import com.spordee.user.response.common.MetaData;
 import com.spordee.user.service.UserService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -72,7 +71,7 @@ public class UserController {
 
     @PostMapping("${api.class.method}")
     public Mono<CommonResponse> saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
-                                                    Principal principal) {
+                                                    Principal principal, @RequestHeader("Authorization") String token) {
         log.info("LOG::UserController saveOnboardingUsers");
         AtomicReference<String> deviceId = new AtomicReference<>("");
         AtomicReference<String> device = new AtomicReference<>("");
@@ -87,16 +86,18 @@ public class UserController {
                         deviceId.set(spordUser.getDeviceId());
                         device.set(spordUser.getDevice());
                         SignUpDto signUpRequest = SignUpDto.builder()
-                                .username(principal.getName())
+                                .providerId(principal.getName())
                                 .device(Device.valueOf(device.get()))
                                 .deviceId(deviceId.get())
+                                .authProvider(((SpordUser) ((UsernamePasswordAuthenticationToken) user).getPrincipal()).getAuthProvider())
                                 .role(initialUserSaveRequestDto.getRegistrationType())
                                 .build();
 
                         System.out.println("SINGUP DTO : " + signUpRequest);
 
-                        return webClient.post()
+                        return webClient.patch()
                                 .uri("/auth/v1/onboarding")
+                                .header("Authorization",token)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(BodyInserters.fromValue(signUpRequest))
                                 .retrieve()
@@ -125,4 +126,6 @@ public class UserController {
                     return Mono.just(commonResponse);
                 });
     }
+
+
 }
