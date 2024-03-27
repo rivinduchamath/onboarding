@@ -69,7 +69,7 @@ public class GetUserServiceImpl implements GetUserService {
     }
 
     private Object fetchPersonalDetailsAsync(String username) {
-        return Mono.fromCallable(() -> profileDataRepository.findInstituteDataByUserNameEquals(username))
+        return Mono.fromCallable(() -> profileDataRepository.findByUserName(username))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

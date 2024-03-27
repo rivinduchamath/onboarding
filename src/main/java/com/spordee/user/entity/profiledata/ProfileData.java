@@ -1,5 +1,7 @@
 package com.spordee.user.entity.profiledata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.spordee.user.entity.objects.Achievements;
 import com.spordee.user.entity.objects.InstituteDetails;
 import com.spordee.user.entity.profiledata.cascadetables.*;
@@ -22,6 +24,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Document("profile_data")
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 
 //@CompoundIndexes({
