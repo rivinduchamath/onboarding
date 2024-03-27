@@ -1,12 +1,15 @@
 package com.spordee.user.service.impl.update;
 
 import com.spordee.user.dto.request.*;
+import com.spordee.user.entity.TokenStorage;
 import com.spordee.user.entity.profiledata.ProfileData;
 import com.spordee.user.entity.sportsuserdata.UserSports;
+import com.spordee.user.exceptions.InternalServerException;
 import com.spordee.user.repository.PrimaryUserDataRepository;
 import com.spordee.user.repository.ProfileDataRepository;
 import com.spordee.user.repository.SportsRepository;
 import com.spordee.user.dto.response.common.CommonResponse;
+import com.spordee.user.repository.TokenStorageRepository;
 import com.spordee.user.service.UpdateUserService;
 import com.spordee.user.util.CommonMethods;
 import lombok.AllArgsConstructor;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import static com.spordee.user.enums.UserSessionTypes.UPDATE_PROFILE;
 import static com.spordee.user.util.ResponseMethods.*;
 
 @Service

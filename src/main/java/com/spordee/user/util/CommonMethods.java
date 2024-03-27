@@ -1,18 +1,22 @@
 package com.spordee.user.util;
 
+import com.spordee.user.annotations.TrackExecutionTime;
 import com.spordee.user.dto.request.InitialUserSaveRequestDto;
 import com.spordee.user.dto.objects.UserImagesDto;
 import com.spordee.user.dto.objects.UserSportsDto;
 import com.spordee.user.dto.request.*;
+import com.spordee.user.entity.TokenStorage;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.entity.profiledata.ProfileData;
 import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.enums.UserStatus;
+import com.spordee.user.exceptions.InternalServerException;
 import com.spordee.user.repository.PrimaryUserDataRepository;
 import com.spordee.user.repository.ProfileDataRepository;
 import com.spordee.user.repository.SportsRepository;
 import com.spordee.user.dto.response.common.CommonResponse;
+import com.spordee.user.repository.TokenStorageRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static com.spordee.user.enums.RegistrationType.REGISTRATION_TYPE_FAN;
 import static com.spordee.user.enums.RegistrationType.REGISTRATION_TYPE_PLAYER;
+import static com.spordee.user.enums.UserSessionTypes.UPDATE_PROFILE;
 import static com.spordee.user.util.ResponseMethods.profileDataUpdateSuccess;
 
 @Component
@@ -104,7 +109,18 @@ public  class CommonMethods {
                 .build();
 
     }
+    private final TokenStorageRepository tokenStorageRepository;
+    public void activitySessions(boolean isAllDevice, String userId, String deviceId, String userType) {
 
+        try {
+            tokenStorageRepository.save(TokenStorage.builder().id(userId).isAllDevice(isAllDevice).userType(userType).deviceId(deviceId).userName(userId).createdTime(getNewEpochTimeUtc()).build());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getMessage());
+        }
+    }
+    public static long getNewEpochTimeUtc() {
+        return Instant.now().getEpochSecond();
+    }
     private PrimaryUserDetails savePrimaryUserData(PrimaryUserDetails primaryUserData) {
         // Simulate saving PrimaryUserDetails asynchronously
         return primaryUserDataRepository.save(primaryUserData);
@@ -112,7 +128,9 @@ public  class CommonMethods {
 
     private ProfileData saveProfileData(ProfileData profileData) {
         // Simulate saving ProfileData asynchronously
-        return profileDataRepository.save(profileData);
+        ProfileData save = profileDataRepository.save(profileData);
+        activitySessions(true, profileData.getUserName(), "", UPDATE_PROFILE.toString());
+        return save;
     }
     public static void updateProfileDataConditionally(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData) {
         Optional.ofNullable(updateUserRequestDto.getName()).ifPresent(primaryUserData::setName);
@@ -221,6 +239,7 @@ public  class CommonMethods {
         Optional.ofNullable(achievementRequest.getAchievements()).ifPresent(profileData::setAchievements);
         return profileData;
     }
+
     public Mono<CommonResponse> updatePrimaryAndProfileData(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData, ProfileData profileData, CommonResponse commonResponse) {
 
         updateProfileDataConditionally(updateUserRequestDto, primaryUserData);
@@ -228,6 +247,7 @@ public  class CommonMethods {
 
         return Mono.defer(() ->
                         Mono.fromCallable(() -> {
+
                             // Save the updated data asynchronously on a separate scheduler
                             PrimaryUserDetails savedPrimaryUserData = savePrimaryUserData(primaryUserData);
                             ProfileData savedProfileData = saveProfileData(profileData);

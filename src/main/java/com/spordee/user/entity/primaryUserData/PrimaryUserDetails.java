@@ -1,6 +1,7 @@
 package com.spordee.user.entity.primaryUserData;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.spordee.user.dto.objects.UserSportsDto;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.entity.sportsuserdata.UserSports;
@@ -24,6 +25,7 @@ import java.util.Set;
 @Document( "primary_user_details")
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PrimaryUserDetails {
 
     @Id

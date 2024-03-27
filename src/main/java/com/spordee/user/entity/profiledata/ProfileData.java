@@ -1,5 +1,6 @@
 package com.spordee.user.entity.profiledata;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.spordee.user.entity.objects.Achievements;
 import com.spordee.user.entity.objects.InstituteDetails;
 import com.spordee.user.entity.profiledata.cascadetables.*;
@@ -23,7 +24,7 @@ import java.util.Set;
 @Document("profile_data")
 @NoArgsConstructor
 @Builder
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 //@CompoundIndexes({
 //        @CompoundIndex(name = "user_name", def = "{'email.id' : 1, 'age': 1}")
 //})
