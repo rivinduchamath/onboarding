@@ -1,8 +1,8 @@
-package com.spordee.user.dto;
+package com.spordee.user.dto.request;
 
-import com.spordee.user.configurations.Entity.Achievements;
-import com.spordee.user.configurations.Entity.InstituteDetails;
-import com.spordee.user.configurations.Entity.PlayerSportsHistory;
+import com.spordee.user.entity.objects.Achievements;
+import com.spordee.user.entity.objects.InstituteDetails;
+import com.spordee.user.entity.objects.PlayerSportsHistory;
 import com.spordee.user.dto.objects.UserSportsDto;
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package com.spordee.user.configurations.Request;
+package com.spordee.user.dto.request;
 
 import com.spordee.user.enums.AuthProvider;
 import com.spordee.user.enums.Device;

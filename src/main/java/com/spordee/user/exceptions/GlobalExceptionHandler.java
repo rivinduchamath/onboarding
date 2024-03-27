@@ -1,15 +1,7 @@
 package com.spordee.user.exceptions;
 
-import com.spordee.user.enums.CommonMessages;
-import com.spordee.user.enums.StatusType;
-import com.spordee.user.response.common.CommonResponse;
-import com.spordee.user.response.common.MetaData;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestControllerAdvice
@@ -38,19 +30,19 @@ public class GlobalExceptionHandler extends Exception {
 
 //        return commonResponse;
 //    }
-    @ExceptionHandler(Exception.class)
-    public static Mono<CommonResponse> handleExceptionRootReactive(
-            CommonMessages commonMessages,
-                                          StatusType statusType,
-                                          HttpStatus httpStatus,
-                                          Throwable exception,
-                                          CommonResponse commonResponse,
-                                          String message
-            ) {
-        log.error("LOG::UserServiceImpl saveOnboardingUsers Exception", exception);
-        commonResponse.setStatus(StatusType.STATUS_FAIL);
-        commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Error In Server"));
-        return Mono.just(commonResponse);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public static Mono<CommonResponse> handleExceptionRootReactive(
+//            CommonMessages commonMessages,
+//                                          StatusType statusType,
+//                                          HttpStatus httpStatus,
+//                                          Throwable exception,
+//                                          CommonResponse commonResponse,
+//                                          String message
+//            ) {
+//        log.error("LOG::UserServiceImpl saveOnboardingUsers Exception", exception);
+//        commonResponse.setStatus(StatusType.STATUS_FAIL);
+//        commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                "Error In Server"));
+//        return Mono.just(commonResponse);
+//    }
 }

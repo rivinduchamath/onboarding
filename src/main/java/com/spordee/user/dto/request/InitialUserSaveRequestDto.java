@@ -1,4 +1,4 @@
-package com.spordee.user.dto;
+package com.spordee.user.dto.request;
 
 import com.spordee.user.dto.objects.UserImagesDto;
 import com.spordee.user.dto.objects.UserSportsDto;

@@ -31,29 +31,14 @@ public class JwtTokenAuthenticationFilter implements WebFilter {
     public static final String HEADER_PREFIX = "Bearer ";
 
 //    @Value("${jwt.tokenDecryptCode}")
-    private  String tokenDecryptCode ="kfsdSDFsdfmflks32FSDskfdskfsdSDFsdfmflks32FSDskfdskfsdSDFsdfmflks32FSDskfdskfsdSDFsdfmflks32FSDskfds";
+    private final String tokenDecryptCode ="kfsdSDFsdfmflks32FSDskfdskfsdSDFsdfmflks32FSDskfdskfsdSDFsdfmflks32FSDskfdskfsdSDFsdfmflks32FSDskfds";
 
     private final JwtTokenProvider tokenProvider;
 
-//    @Bean
-//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-//        return http
-//                .csrf()
-//                .csrfTokenRepository(csrfTokenRepository())
-//                .requireCsrfProtectionMatcher(ServerWebExchangeMatchers.pathMatchers("/secured/**"))
-//                .and()
-//                .build();
-//    }
-//
-//    @Bean
-//    public ServerCsrfTokenRepository csrfTokenRepository() {
-//        CookieServerCsrfTokenRepository repository = CookieServerCsrfTokenRepository.withHttpOnlyFalse();
-//        repository.setCookieName("XSRF-TOKEN"); // Customize the CSRF cookie name if needed
-//        return repository;
-//    }
+
     @Override
     @NonNull
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         String token = resolveToken(exchange.getRequest());
        String jwtToken = tokenDecryption(token);
         if (StringUtils.hasText(jwtToken) && this.tokenProvider.validateToken(jwtToken)) {

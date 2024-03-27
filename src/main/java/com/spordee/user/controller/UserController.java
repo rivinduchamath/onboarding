@@ -1,14 +1,13 @@
 package com.spordee.user.controller;
 
-import com.spordee.user.configurations.Entity.SpordUser;
-import com.spordee.user.configurations.Request.SignUpDto;
-import com.spordee.user.dto.InitialUserSaveRequestDto;
-import com.spordee.user.dto.UpdateUserRequestDto;
+import com.spordee.user.entity.objects.SpordUser;
+import com.spordee.user.dto.request.SignUpDto;
+import com.spordee.user.dto.request.InitialUserSaveRequestDto;
 import com.spordee.user.enums.CommonMessages;
 import com.spordee.user.enums.Device;
 import com.spordee.user.enums.StatusType;
-import com.spordee.user.response.common.CommonResponse;
-import com.spordee.user.response.common.MetaData;
+import com.spordee.user.dto.response.common.CommonResponse;
+import com.spordee.user.dto.response.common.MetaData;
 import com.spordee.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +22,12 @@ import reactor.core.publisher.Mono;
 import java.security.Principal;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.spordee.user.util.ResponseMethods.userNotFound;
+
 
 @Slf4j
 @RestController
-@RequestMapping("${api.class.header}")
+@RequestMapping("${api.class.class-onboarding-user.header}")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -35,17 +36,23 @@ public class UserController {
     private final WebClient webClient;
 
 
-    @PostMapping("${api.class.method}")
+    @PostMapping("${api.class.class-onboarding-user.method}")
     public Mono<CommonResponse> saveOnboardingUsers(@RequestBody InitialUserSaveRequestDto initialUserSaveRequestDto,
                                                     Principal principal, @RequestHeader("Authorization") String token) {
         log.info("LOG::UserController saveOnboardingUsers");
         AtomicReference<String> deviceId = new AtomicReference<>("");
         AtomicReference<String> device = new AtomicReference<>("");
         // save data into database -> PimraryUserDetails
-        Mono<CommonResponse> monoResponse =  userService.saveOnboardingUsers(initialUserSaveRequestDto,new CommonResponse(), principal.getName());
+        String username = principal.getName();
+        CommonResponse commonResponse = new CommonResponse();
+        if(username.isBlank()){
+            return userNotFound(commonResponse);
+        }
+        initialUserSaveRequestDto.setUserName(username);
+        Mono<CommonResponse> monoResponse =  userService.saveOnboardingUsers(initialUserSaveRequestDto,commonResponse);
 
         if(monoResponse == null){
-            CommonResponse commonResponse = new CommonResponse();
+
             commonResponse.setMeta(new MetaData(true,CommonMessages.INTERNAL_SERVER_ERROR,500,"Issue is in save the details in database"));
             commonResponse.setData("There is an issue in saving the details in database");
             commonResponse.setStatus(StatusType.STATUS_FAIL);
@@ -91,7 +98,6 @@ public class UserController {
                 .onErrorResume(exception -> {
                     log.error("LOG::UserController saveOnboardingUsers user Save Exception " +
                             "(first Name = {})", initialUserSaveRequestDto.getFirstName());
-                    CommonResponse commonResponse = new CommonResponse();
                     commonResponse.setData(exception.getMessage());
                     commonResponse.setStatus(StatusType.STATUS_FAIL);
                     commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(),

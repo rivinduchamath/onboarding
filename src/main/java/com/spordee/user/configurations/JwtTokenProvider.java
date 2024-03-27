@@ -1,24 +1,19 @@
 package com.spordee.user.configurations;
 
-import com.spordee.user.configurations.Entity.SpordUser;
+import com.spordee.user.entity.objects.SpordUser;
 import com.spordee.user.enums.AuthProvider;
 import com.spordee.user.tokenmapper.objects.Role;
 import com.spordee.user.util.AttributesCommon;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 
@@ -28,11 +23,9 @@ import static java.util.stream.Collectors.joining;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtTokenProvider {
-    private static final String AUTHORITIES_KEY = "roles";
     private static final String DEVICE_ID = "JWT_DEVICE_ID";
     private static final String DEVICE = "DEVICE_NAME";
     private static final String AUTH_PROVIDER = "AUTH_PROVIDER";
-    private static final String AUTH_ID = "sub";
 
 
     private String secretKey = "04ca023b39512e46d0c2cf4b48d5aac61d34302994c87ed4eff225dcf3b0a218739f3897051a057f9b846a69ea2927a587044164b7bae5e1306219d50b588cb1";
@@ -80,8 +73,6 @@ public class JwtTokenProvider {
     public List<Role> extractRolesFromToken(String token) {
         Key signingKey = new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS256.getJcaName());
         try {
-
-//            Claims claims =Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token).getBody();
             JwsHeader header = Jwts.parserBuilder()
                     .setSigningKey(signingKey)
                     .build()

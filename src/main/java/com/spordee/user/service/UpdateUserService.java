@@ -1,12 +1,19 @@
 package com.spordee.user.service;
 
-import com.spordee.user.dto.UpdateUserRequestDto;
-import com.spordee.user.dto.request.PersonalInformationRequestDto;
-import com.spordee.user.response.common.CommonResponse;
+import com.spordee.user.dto.request.*;
+import com.spordee.user.dto.response.common.CommonResponse;
 import reactor.core.publisher.Mono;
 
 public interface UpdateUserService {
     Mono<CommonResponse> updatePersonalDetails(PersonalInformationRequestDto updateUserRequestDto, CommonResponse commonResponse);
-    Mono<CommonResponse> updateHeightWeightAndSports(UpdateUserRequestDto updateUserRequestDto,String username,CommonResponse commonResponse);
-    Mono<CommonResponse> updateSkills(UpdateUserRequestDto updateUserRequestDto,String username,CommonResponse commonResponse);
+
+    Mono<CommonResponse> updateSpecs(SpecsInfoRequestDto specsInfoRequestDto, CommonResponse commonResponse);
+
+    Mono<CommonResponse> updateSkillsAndSports(UpdateSkillsRequest updateSkillsRequest, CommonResponse commonResponse);
+
+    Mono<CommonResponse> updateAchievements(AchievementRequest achievementRequest, CommonResponse commonResponse);
+
+    Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto, CommonResponse commonResponse);
+
+
 }

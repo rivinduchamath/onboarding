@@ -1,4 +1,4 @@
-package com.spordee.user.util;
+package com.spordee.user.enums;
 
 import lombok.Getter;
 

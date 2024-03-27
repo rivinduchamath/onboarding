@@ -1,59 +1,47 @@
 package com.spordee.user.util;
 
-import com.spordee.user.dto.InitialUserSaveRequestDto;
-import com.spordee.user.dto.UpdateUserRequestDto;
+import com.spordee.user.dto.request.InitialUserSaveRequestDto;
 import com.spordee.user.dto.objects.UserImagesDto;
 import com.spordee.user.dto.objects.UserSportsDto;
-import com.spordee.user.dto.request.PersonalInformationRequestDto;
+import com.spordee.user.dto.request.*;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.primaryUserData.cascadetables.UserImages;
 import com.spordee.user.entity.profiledata.ProfileData;
 import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.enums.UserStatus;
-import com.spordee.user.exceptions.OAuth2AuthenticationProcessingException;
-import io.micrometer.observation.ObservationFilter;
-import org.springframework.beans.factory.annotation.Value;
+import com.spordee.user.repository.PrimaryUserDataRepository;
+import com.spordee.user.repository.ProfileDataRepository;
+import com.spordee.user.repository.SportsRepository;
+import com.spordee.user.dto.response.common.CommonResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuples;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.spordee.user.enums.RegistrationType.REGISTRATION_TYPE_FAN;
 import static com.spordee.user.enums.RegistrationType.REGISTRATION_TYPE_PLAYER;
+import static com.spordee.user.util.ResponseMethods.profileDataUpdateSuccess;
 
 @Component
+@Slf4j
+@AllArgsConstructor
 public  class CommonMethods {
-
-    private CommonMethods(){
-
-    }
-
-    @Value("${jwt.tokenDecryptCode}")
-    private  String tokenDecryptCode;
+    private final ProfileDataRepository profileDataRepository;
+    private final PrimaryUserDataRepository primaryUserDataRepository;
+    private final SportsRepository sportsRepository;
     public static long getCurrentEpochTimeInSec(){
         return Instant.now().getEpochSecond();
     }
 
 
 
-    public static UserSports changeAndUpdateToUserSports(UserSportsDto userSportsDto,UserSports userSports){
-        userSports.setAmericanFootball(userSportsDto.getAmericanFootball());
-        userSports.setBaseball(userSportsDto.getBaseball());
-        userSports.setBasketball(userSportsDto.getBasketball());
-        userSports.setHockey(userSportsDto.getIceHockey());
-        userSports.setCricket(userSportsDto.getCricket());
-        userSports.setRugby(userSportsDto.getRugby());
-        userSports.setSoccer(userSportsDto.getSoccer());
-        userSports.setUpdatedDate(String.valueOf(getCurrentEpochTimeInSec()));
-        return userSports;
-    }
+
 
 
     public static List<UserImages> saveUserImagesFromDto(List<UserImagesDto> userImagesDtoList, long currentTime) {
@@ -116,7 +104,39 @@ public  class CommonMethods {
                 .build();
 
     }
+    public Mono<CommonResponse> updatePrimaryAndProfileData(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData, ProfileData profileData, CommonResponse commonResponse) {
 
+        updateProfileDataConditionally(updateUserRequestDto, primaryUserData);
+        updateUserDetailsConditionally(updateUserRequestDto, profileData);
+
+        return Mono.defer(() ->
+                        Mono.fromCallable(() -> {
+                            // Save the updated data asynchronously on a separate scheduler
+                            PrimaryUserDetails savedPrimaryUserData = savePrimaryUserData(primaryUserData);
+                            ProfileData savedProfileData = saveProfileData(profileData);
+
+                            // Return the saved data
+                            return Mono.just(Tuples.of(savedPrimaryUserData, savedProfileData));
+                        })
+                )
+                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
+                .flatMap(savedDataMono -> savedDataMono)
+                .flatMap(savedData -> {
+                    log.info("LOG:: Updating primary user details and profile data completed");
+                    commonResponse.setData(savedData);
+                    return profileDataUpdateSuccess(commonResponse);
+                });
+    }
+
+    private PrimaryUserDetails savePrimaryUserData(PrimaryUserDetails primaryUserData) {
+        // Simulate saving PrimaryUserDetails asynchronously
+        return primaryUserDataRepository.save(primaryUserData);
+    }
+
+    private ProfileData saveProfileData(ProfileData profileData) {
+        // Simulate saving ProfileData asynchronously
+        return profileDataRepository.save(profileData);
+    }
     public static void updateProfileDataConditionally(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData) {
         Optional.ofNullable(updateUserRequestDto.getName()).ifPresent(primaryUserData::setName);
         Optional.ofNullable(updateUserRequestDto.getUserName()).ifPresent(primaryUserData::setUserName);
@@ -131,30 +151,122 @@ public  class CommonMethods {
         Optional.ofNullable(updateUserRequestDto.getCitizenship()).ifPresent(profileData::setCitizenShip);
         Optional.ofNullable(updateUserRequestDto.getPlaceOfBirth()).ifPresent(profileData::setPlaceOfBirth);
     }
-    public static PrimaryUserDetails updatePersonal(UpdateUserRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserDetails){
-        primaryUserDetails.setUserEmail(StringUtils.hasText(updateUserRequestDto.getEmail()) ? updateUserRequestDto.getEmail() : primaryUserDetails.getUserEmail());
-        primaryUserDetails.setName(StringUtils.hasText(updateUserRequestDto.getName()) ? updateUserRequestDto.getName() : primaryUserDetails.getName());
-        primaryUserDetails.setBirthDay(Long.valueOf(updateUserRequestDto.getDateOfBirth()) != null ? updateUserRequestDto.getDateOfBirth() : primaryUserDetails.getBirthDay());
-        primaryUserDetails.setPhoneNumber(StringUtils.hasText(updateUserRequestDto.getPhoneNumber()) ? updateUserRequestDto.getPhoneNumber() : primaryUserDetails.getPhoneNumber());
-        primaryUserDetails.setName(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : primaryUserDetails.getName());
-        primaryUserDetails.setLanguages(!updateUserRequestDto.getLanguages().isEmpty() ? updateUserRequestDto.getLanguages() : primaryUserDetails.getLanguages());
-        primaryUserDetails.setUpdatedDate(getCurrentEpochTimeInSec());
-        return primaryUserDetails;
+    private UserSports saveSportsUserData(UserSports primaryUserData) {
+        // Simulate saving PrimaryUserDetails asynchronously
+        return sportsRepository.save(primaryUserData);
+    }
+    public static UserSports changeAndUpdateToUserSports(UserSportsDto userSportsDto,UserSports userSports){
+        Optional.ofNullable(userSportsDto.getAmericanFootball()).ifPresent(userSports::setAmericanFootball);
+        Optional.ofNullable(userSportsDto.getBaseball()).ifPresent(userSports::setBaseball);
+        Optional.ofNullable(userSportsDto.getBasketball()).ifPresent(userSports::setBasketball);
+        Optional.ofNullable(userSportsDto.getIceHockey()).ifPresent(userSports::setHockey);
+        Optional.ofNullable(userSportsDto.getCricket()).ifPresent(userSports::setCricket);
+        Optional.ofNullable(userSportsDto.getRugby()).ifPresent(userSports::setRugby);
+        Optional.ofNullable(userSportsDto.getSoccer()).ifPresent(userSports::setSoccer);
+        userSports.setUpdatedDate(String.valueOf(getCurrentEpochTimeInSec()));
+        return userSports;
+    }
+    public Mono<CommonResponse> updateSportsAndProfileData(SpecsInfoRequestDto updateUserRequestDto, UserSports userSports, ProfileData profileData, CommonResponse commonResponse) {
+        ProfileData profileData1 = updateProfileDataSpecsConditionally(updateUserRequestDto, profileData);
+        UserSports userSports1 = changeAndUpdateToUserSports(updateUserRequestDto.getUserSportsDto(), userSports);
+
+        return Mono.defer(() ->
+                        Mono.fromCallable(() -> {
+                            // Save the updated data asynchronously on a separate scheduler
+                            UserSports saveSportsUserData = saveSportsUserData(userSports1);
+                            ProfileData savedProfileData = saveProfileData(profileData1);
+
+                            // Return the saved data
+                            return Mono.just(Tuples.of(saveSportsUserData, savedProfileData));
+                        })
+                )
+                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
+                .flatMap(savedDataMono -> savedDataMono)
+                .flatMap(savedData -> {
+                    log.info("LOG:: Updating primary user details and profile data completed");
+                    commonResponse.setData(savedData);
+                    return profileDataUpdateSuccess(commonResponse);
+                });
     }
 
-    public static ProfileData updatePersonalData(UpdateUserRequestDto updateUserRequestDto, ProfileData profileData){
-        profileData.setEmail(StringUtils.hasText(updateUserRequestDto.getEmail()) ? updateUserRequestDto.getEmail() : profileData.getEmail());
-        profileData.setName(StringUtils.hasText(updateUserRequestDto.getName()) ? updateUserRequestDto.getName() : profileData.getName());
-        profileData.setBirthDay(Long.valueOf(updateUserRequestDto.getDateOfBirth()) != null ? String.valueOf(updateUserRequestDto.getDateOfBirth()) : profileData.getBirthDay());
-        profileData.setPhoneNumber(StringUtils.hasText(updateUserRequestDto.getPhoneNumber()) ? updateUserRequestDto.getPhoneNumber() : profileData.getPhoneNumber());
-        profileData.setCitizenShip(StringUtils.hasText(updateUserRequestDto.getCitizenship()) ? updateUserRequestDto.getCitizenship() : profileData.getCitizenShip());
-        profileData.setCountryOfResidence(StringUtils.hasText(updateUserRequestDto.getHomeCountry()) ? updateUserRequestDto.getHomeCountry() : profileData.getCountryOfResidence());
-        profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCountryOfBirth()) ? updateUserRequestDto.getCountryOfBirth() : profileData.getBirthCountry());
-        profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCityOfBirth()) ? updateUserRequestDto.getCityOfBirth() : profileData.getBirthCountry());
-        profileData.setBirthCountry(StringUtils.hasText(updateUserRequestDto.getCityOfResidence()) ? updateUserRequestDto.getCityOfResidence() : profileData.getBirthCountry());
-        profileData.setCountryOfResidence(StringUtils.hasText(updateUserRequestDto.getCountryOfResidence()) ? updateUserRequestDto.getEmail() : profileData.getCountryOfResidence());
-        profileData.setLanguages(!updateUserRequestDto.getLanguages().isEmpty() ? updateUserRequestDto.getLanguages() : profileData.getLanguages());
-        profileData.setUpdatedDate(getCurrentEpochTimeInSec());
+    private ProfileData updateProfileDataSpecsConditionally(SpecsInfoRequestDto updateUserRequestDto, ProfileData profileData) {
+        Optional.ofNullable(updateUserRequestDto.getHeight()).ifPresent(profileData::setHeight);
+        Optional.ofNullable(updateUserRequestDto.getWeight()).ifPresent(profileData::setWeight);
+        return profileData;
+    }
+
+    public Mono<CommonResponse> updateSkillsAndSports(UpdateSkillsRequest updateSkillsRequest, ProfileData profileData, CommonResponse commonResponse) {
+        ProfileData profileData1 = updateProfileDataSkillsConditionally(updateSkillsRequest, profileData);
+
+        return Mono.defer(() ->
+                        Mono.fromCallable(() -> {
+                            // Save the updated data asynchronously on a separate scheduler
+                            ProfileData savedProfileData = saveProfileData(profileData1);
+                            // Return the saved data
+                            return Mono.just(savedProfileData);
+                        })
+                )
+                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
+                .flatMap(savedDataMono -> savedDataMono)
+                .flatMap(savedData -> {
+                    log.info("LOG:: Updating primary user details Skills and profile data completed");
+                    commonResponse.setData(savedData);
+                    return profileDataUpdateSuccess(commonResponse);
+                });
+    }
+
+    private ProfileData updateProfileDataSkillsConditionally(UpdateSkillsRequest updateSkillsRequest, ProfileData profileData) {
+        Optional.ofNullable(updateSkillsRequest.getSkills()).ifPresent(profileData::setSkills);
+        return profileData;
+    }
+
+    public Mono<CommonResponse> updateAchievements(AchievementRequest achievementRequest, ProfileData profileData, CommonResponse commonResponse) {
+        ProfileData profileData1 = updateAchievementsConditionally(achievementRequest, profileData);
+
+        return Mono.defer(() ->
+                        Mono.fromCallable(() -> {
+                            // Save the updated data asynchronously on a separate scheduler
+                            ProfileData savedProfileData = saveProfileData(profileData1);
+                            // Return the saved data
+                            return Mono.just(savedProfileData);
+                        })
+                )
+                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
+                .flatMap(savedDataMono -> savedDataMono)
+                .flatMap(savedData -> {
+                    log.info("LOG:: Updating updateAchievements details Skills and profile data completed");
+                    commonResponse.setData(savedData);
+                    return profileDataUpdateSuccess(commonResponse);
+                });
+    }
+
+    private ProfileData updateAchievementsConditionally(AchievementRequest achievementRequest, ProfileData profileData) {
+        Optional.ofNullable(achievementRequest.getAchievements()).ifPresent(profileData::setAchievements);
+        return profileData;
+    }
+
+    public Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto, ProfileData profileData, CommonResponse commonResponse) {
+        ProfileData profileData1 = updateInstitutionConditionally(institutionsRequestDto, profileData);
+
+        return Mono.defer(() ->
+                        Mono.fromCallable(() -> {
+                            // Save the updated data asynchronously on a separate scheduler
+                            ProfileData savedProfileData = saveProfileData(profileData1);
+                            // Return the saved data
+                            return Mono.just(savedProfileData);
+                        })
+                )
+                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
+                .flatMap(savedDataMono -> savedDataMono)
+                .flatMap(savedData -> {
+                    log.info("LOG:: Updating updateInstitution details Skills and profile data completed");
+                    commonResponse.setData(savedData);
+                    return profileDataUpdateSuccess(commonResponse);
+                });
+    }
+
+    private ProfileData updateInstitutionConditionally(InstitutionsRequestDto institutionsRequestDto, ProfileData profileData) {
+        Optional.ofNullable(institutionsRequestDto.getInstituteDetails()).ifPresent(profileData::setInstituteDetails);
         return profileData;
     }
 

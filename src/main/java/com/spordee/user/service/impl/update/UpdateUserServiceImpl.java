@@ -1,34 +1,22 @@
 package com.spordee.user.service.impl.update;
 
-import com.spordee.user.dto.UpdateUserRequestDto;
-import com.spordee.user.dto.request.PersonalInformationRequestDto;
+import com.spordee.user.dto.request.*;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.profiledata.ProfileData;
 import com.spordee.user.entity.sportsuserdata.UserSports;
-import com.spordee.user.enums.CommonMessages;
-import com.spordee.user.enums.StatusType;
 import com.spordee.user.repository.PrimaryUserDataRepository;
 import com.spordee.user.repository.ProfileDataRepository;
 import com.spordee.user.repository.SportsRepository;
-import com.spordee.user.response.common.CommonResponse;
-import com.spordee.user.response.common.MetaData;
+import com.spordee.user.dto.response.common.CommonResponse;
 import com.spordee.user.service.UpdateUserService;
+import com.spordee.user.util.CommonMethods;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuples;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.spordee.user.exceptions.GlobalExceptionHandler.handleExceptionRootReactive;
-import static com.spordee.user.util.CommonMethods.*;
 import static com.spordee.user.util.ResponseMethods.*;
 
 @Service
@@ -38,10 +26,16 @@ public class UpdateUserServiceImpl implements UpdateUserService {
     private final PrimaryUserDataRepository primaryUserDataRepository;
     private final SportsRepository sportsRepository;
     private final ProfileDataRepository profileDataRepository;
+    private final CommonMethods commonMethods;
 
     @Override
     public Mono<CommonResponse> updatePersonalDetails(PersonalInformationRequestDto updateUserRequestDto, CommonResponse commonResponse) {
         log.info("LOG:: UpdateUserServiceImpl updatePersonalDetails for username: {}", updateUserRequestDto.getUserName());
+        try {
+            PrimaryUserDetails byUserName = primaryUserDataRepository.findByUserName(updateUserRequestDto.getUserName());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         return Mono.fromCallable(() -> primaryUserDataRepository.findByUserName(updateUserRequestDto.getUserName()))
                 // Cache primary user data (if applicable)
@@ -53,7 +47,8 @@ public class UpdateUserServiceImpl implements UpdateUserService {
                                     if (profileData != null) {
                                         log.info("LOG:: Profile data found for username: {}", profileData.getUserName());
                                         // Use a locking mechanism to synchronize profile updates
-                                        return updatePrimaryAndProfileData(updateUserRequestDto, primaryUserData, profileData, commonResponse)
+                                        return commonMethods.updatePrimaryAndProfileData(updateUserRequestDto,
+                                                        primaryUserData, profileData, commonResponse)
                                                 .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
                                     } else {
                                         log.info("LOG:: Profile data Not Found for username: {}", primaryUserData.getUserName());
@@ -73,96 +68,132 @@ public class UpdateUserServiceImpl implements UpdateUserService {
                 .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
     }
 
-    private Mono<CommonResponse> updatePrimaryAndProfileData(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData, ProfileData profileData, CommonResponse commonResponse) {
 
-        updateProfileDataConditionally(updateUserRequestDto, primaryUserData);
-        updateUserDetailsConditionally(updateUserRequestDto, profileData);
-
-        return Mono.defer(() ->
-                        Mono.fromCallable(() -> {
-                            // Save the updated data asynchronously on a separate scheduler
-                            PrimaryUserDetails savedPrimaryUserData = savePrimaryUserData(primaryUserData);
-                            ProfileData savedProfileData = saveProfileData(profileData);
-
-                            // Return the saved data
-                            return Mono.just(Tuples.of(savedPrimaryUserData, savedProfileData));
-                        })
-                )
-                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
-                .flatMap(savedDataMono -> savedDataMono)
-                .flatMap(savedData -> {
-                    log.info("LOG:: Updating primary user details and profile data completed");
-                    commonResponse.setData(savedData);
-                    return profileDataUpdateSuccess(commonResponse);
-                });
-    }
-
-
-
-    private PrimaryUserDetails savePrimaryUserData(PrimaryUserDetails primaryUserData) {
-        // Simulate saving PrimaryUserDetails asynchronously
-        return primaryUserDataRepository.save(primaryUserData);
-    }
-
-    private ProfileData saveProfileData(ProfileData profileData) {
-        // Simulate saving ProfileData asynchronously
-        return profileDataRepository.save(profileData);
-    }
     private Mono<ProfileData> fetchProfileDataAsync(String username) {
         return Mono.fromCallable(() -> profileDataRepository.findByUserName(username))
                 .subscribeOn(Schedulers.boundedElastic());
     }
     @Override
-    public Mono<CommonResponse> updateHeightWeightAndSports(UpdateUserRequestDto updateUserRequestDto, String username, CommonResponse commonResponse) {
-        UserSports userSports = sportsRepository.findByUserName(username);
-        userSports = changeAndUpdateToUserSports(updateUserRequestDto.getUserSportsDto(),userSports);
-        sportsRepository.save(userSports);
-        log.info("UserSports saved.");
-        ProfileData profileData = profileDataRepository.findByUserName(username);
-        profileData.setWeight(updateUserRequestDto.getWeight());
-        profileData.setHeight(updateUserRequestDto.getHeight());
-        ProfileData save = profileDataRepository.save(profileData);
-        log.info("profile data is updated {}",profileData.getUserName());
+    public Mono<CommonResponse> updateSpecs(SpecsInfoRequestDto updateUserRequestDto, CommonResponse commonResponse) {
+        return Mono.defer(() -> {
+            log.info("LOG:: UpdateUserServiceImpl updateSpecs for username: {}", updateUserRequestDto.getUserName());
 
-        return Mono.justOrEmpty(save)
-                .flatMap(updateProfile->{
-                    commonResponse.setData(updateProfile);
-                    commonResponse.setMeta(new MetaData(false,CommonMessages.REQUEST_SUCCESS,200,"Profile Updated Successfully"));
-                    commonResponse.setStatus(StatusType.STATUS_SUCCESS);
-                    return Mono.just(commonResponse);
-                }).onErrorResume(exception ->handleExceptionRootReactive(
-                        CommonMessages.INTERNAL_SERVER_ERROR,
-                        StatusType.STATUS_FAIL,
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        exception,
-                        commonResponse,
-                        "Error In Internal Server"
-                ));
+            return Mono.fromCallable(() -> profileDataRepository.findByUserName(updateUserRequestDto.getUserName()))
+                    // Cache primary user data (if applicable)
+                    .map(profileData -> {
+                        if (profileData != null) {
+                            log.info("LOG:: UpdateUserServiceImpl updateSpecs profileData username: {}", profileData.getUserName());
+                            return fetchSportDataAsync(profileData.getUserName())
+                                    .map(userSports -> {
+                                        if (userSports != null) {
+                                            log.info("LOG:: userSports data found for username: {}", userSports.getUserName());
+                                            // Use a locking mechanism to synchronize profile updates
+                                            return commonMethods.updateSportsAndProfileData(updateUserRequestDto,
+                                                            userSports, profileData, commonResponse)
+                                                    .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
+                                        } else {
+                                            log.info("LOG:: userSports data Not Found for username: {}", profileData.getUserName());
+                                            return profileDataIsNull(commonResponse);
+                                        }
+                                    }).subscribeOn(Schedulers.boundedElastic());
+                        } else {
+                            log.info("LOG:: profileData Not Found for username: {}", updateUserRequestDto.getUserName());
+                            return primaryUserDataIsNull(commonResponse);
+                        }
+                    })
+                    .then(Mono.defer(() -> {
+                        log.info("LOG:: user Sports data and primary user details updated successfully");
+                        commonResponse.setData("Updated successfully");
+                        return profileDataUpdateSuccess(commonResponse);
+                    }))
+                    .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
+    });
+    }
 
+
+    private Mono<UserSports> fetchSportDataAsync(String userName) {
+        return Mono.fromCallable(() -> sportsRepository.findByUserName(userName))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+    @Override
+    public Mono<CommonResponse> updateSkillsAndSports(UpdateSkillsRequest updateSkillsRequest, CommonResponse commonResponse) {
+        return Mono.defer(() -> {
+            log.info("LOG:: UpdateUserServiceImpl updateSkillsAndSports for username: {}", updateSkillsRequest.getUserName());
+
+            return Mono.fromCallable(() -> profileDataRepository.findByUserName(updateSkillsRequest.getUserName()))
+                    // Cache primary user data (if applicable)
+                    .map(profileData -> {
+                        if (profileData != null) {
+                            log.info("LOG:: UpdateUserServiceImpl updateSpecs profileData username: {}", profileData.getUserName());
+                            return commonMethods.updateSkillsAndSports(updateSkillsRequest,
+                                             profileData, commonResponse)
+                                    .subscribeOn(Schedulers.boundedElastic());
+                        } else {
+                            log.info("LOG:: profileData Not Found for username: {}", updateSkillsRequest.getUserName());
+                            return primaryUserDataIsNull(commonResponse);
+                        }
+                    })
+                    .then(Mono.defer(() -> {
+                        log.info("LOG:: user Sports data and primary user details updated successfully");
+                        commonResponse.setData("Updated successfully");
+                        return profileDataUpdateSuccess(commonResponse);
+                    }))
+                    .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
+        });
     }
 
     @Override
-    public Mono<CommonResponse> updateSkills(UpdateUserRequestDto updateUserRequestDto, String username, CommonResponse commonResponse) {
-        ProfileData profileData = profileDataRepository.findByUserName(username);
-        profileData.setSkills(updateUserRequestDto.getSkills());
-        ProfileData save = profileDataRepository.save(profileData);
+    public Mono<CommonResponse> updateAchievements(AchievementRequest achievementRequest, CommonResponse commonResponse) {
+        return Mono.defer(() -> {
+            log.info("LOG:: UpdateUserServiceImpl updateAchievements for username: {}", achievementRequest.getUserName());
 
-        return Mono.justOrEmpty(save)
-                .flatMap(updateProfile->{
-                    commonResponse.setData(updateProfile);
-                    commonResponse.setMeta(new MetaData(false,CommonMessages.REQUEST_SUCCESS,200,"Profile Updated Successfully"));
-                    commonResponse.setStatus(StatusType.STATUS_SUCCESS);
-                    return Mono.just(commonResponse);
-                }).onErrorResume(exception ->handleExceptionRootReactive(
-                        CommonMessages.INTERNAL_SERVER_ERROR,
-                        StatusType.STATUS_FAIL,
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        exception,
-                        commonResponse,
-                        "Error In Internal Server"
-                ));
+            return Mono.fromCallable(() -> profileDataRepository.findByUserName(achievementRequest.getUserName()))
+                    // Cache primary user data (if applicable)
+                    .map(profileData -> {
+                        if (profileData != null) {
+                            log.info("LOG:: UpdateUserServiceImpl updateAchievements profileData username: {}", profileData.getUserName());
+                            return commonMethods.updateAchievements(achievementRequest,
+                                            profileData, commonResponse)
+                                    .subscribeOn(Schedulers.boundedElastic());
+                        } else {
+                            log.info("LOG:: profileData Not Found for username: {}", achievementRequest.getUserName());
+                            return primaryUserDataIsNull(commonResponse);
+                        }
+                    })
+                    .then(Mono.defer(() -> {
+                        log.info("LOG:: updateAchievements data and primary user details updated successfully");
+                        commonResponse.setData("Updated successfully");
+                        return profileDataUpdateSuccess(commonResponse);
+                    }))
+                    .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
+        });
+    }
 
+    @Override
+    public Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto, CommonResponse commonResponse) {
+        return Mono.defer(() -> {
+            log.info("LOG:: UpdateUserServiceImpl updateInstitution for username: {}", institutionsRequestDto.getUserName());
 
+            return Mono.fromCallable(() -> profileDataRepository.findByUserName(institutionsRequestDto.getUserName()))
+                    // Cache primary user data (if applicable)
+                    .map(profileData -> {
+                        if (profileData != null) {
+                            log.info("LOG:: UpdateUserServiceImpl updateInstitution profileData username: {}", profileData.getUserName());
+                            return commonMethods.updateInstitution(institutionsRequestDto,
+                                            profileData, commonResponse)
+                                    .subscribeOn(Schedulers.boundedElastic());
+                        } else {
+                            log.info("LOG:: profileData Not Found for username: {}", institutionsRequestDto.getUserName());
+                            return primaryUserDataIsNull(commonResponse);
+                        }
+                    })
+                    .then(Mono.defer(() -> {
+                        log.info("LOG:: updateInstitution data and primary user details updated successfully");
+                        commonResponse.setData("Updated successfully");
+                        return profileDataUpdateSuccess(commonResponse);
+                    }))
+                    .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
+        });
     }
 
 }

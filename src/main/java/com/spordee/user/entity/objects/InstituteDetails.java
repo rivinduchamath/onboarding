@@ -1,4 +1,4 @@
-package com.spordee.user.configurations.Entity;
+package com.spordee.user.entity.objects;
 
 import lombok.*;
 

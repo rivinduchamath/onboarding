@@ -12,7 +12,6 @@ import java.util.List;
 @Configuration
 @Profile("cors")
 public class WebConfig {
-
     @Bean
     CorsWebFilter corsWebFilter() {
         var corsConfiguration = new CorsConfiguration();

@@ -1,15 +1,16 @@
-package com.spordee.user.configurations.Entity;
+package com.spordee.user.entity.objects;
 
 import lombok.*;
+
+import java.util.Date;
 
 @Data
 @ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Achievements {
+public class PlayerSportsHistory {
 
-    private String title;
-    private String institute;
+    private String team;
     private String startTime;
     private String endTime;
 

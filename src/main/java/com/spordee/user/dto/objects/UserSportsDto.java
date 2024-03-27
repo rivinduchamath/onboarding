@@ -11,13 +11,13 @@ import lombok.*;
 @Builder
 public class UserSportsDto {
 
-    private Soccer soccer = new Soccer();
-    private Basketball basketball = new Basketball();
-    private Cricket cricket = new Cricket();
-    private AmericanFootball americanFootball = new AmericanFootball();
-    private IceHockey iceHockey = new IceHockey();
-    private Baseball baseball = new Baseball();
-    private Rugby rugby = new Rugby();
+    private Soccer soccer;
+    private Basketball basketball;
+    private Cricket cricket;
+    private AmericanFootball americanFootball;
+    private IceHockey iceHockey ;
+    private Baseball baseball;
+    private Rugby rugby;
     private String createdDate; // Epoch Time
     private String updatedDate;// Epoch Time
 

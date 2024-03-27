@@ -1,4 +1,4 @@
-package com.spordee.user.response.common;
+package com.spordee.user.dto.response.common;
 
 import com.spordee.user.enums.StatusType;
 import lombok.*;
