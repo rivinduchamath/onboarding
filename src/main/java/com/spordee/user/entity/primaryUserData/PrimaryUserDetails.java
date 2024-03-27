@@ -21,7 +21,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 @ToString
-@Document(collation = "primary_user_details")
+@Document( "primary_user_details")
 @NoArgsConstructor
 @Builder
 public class PrimaryUserDetails {

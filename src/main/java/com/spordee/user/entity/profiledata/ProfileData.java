@@ -20,7 +20,7 @@ import java.util.Set;
 @Setter
 @Getter
 @AllArgsConstructor
-@Document(collation = "profile_data")
+@Document("profile_data")
 @NoArgsConstructor
 @Builder
 

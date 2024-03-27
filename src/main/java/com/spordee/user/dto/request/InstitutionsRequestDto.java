@@ -1,17 +1,16 @@
 package com.spordee.user.dto.request;
 
 import com.spordee.user.entity.objects.InstituteDetails;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@Builder
 @ToString
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class InstitutionsRequestDto {
     private String userName;
     private List<InstituteDetails> instituteDetails;

@@ -1,7 +1,6 @@
 package com.spordee.user.service.impl.update;
 
 import com.spordee.user.dto.request.*;
-import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.profiledata.ProfileData;
 import com.spordee.user.entity.sportsuserdata.UserSports;
 import com.spordee.user.repository.PrimaryUserDataRepository;
@@ -31,11 +30,6 @@ public class UpdateUserServiceImpl implements UpdateUserService {
     @Override
     public Mono<CommonResponse> updatePersonalDetails(PersonalInformationRequestDto updateUserRequestDto, CommonResponse commonResponse) {
         log.info("LOG:: UpdateUserServiceImpl updatePersonalDetails for username: {}", updateUserRequestDto.getUserName());
-        try {
-            PrimaryUserDetails byUserName = primaryUserDataRepository.findByUserName(updateUserRequestDto.getUserName());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
 
         return Mono.fromCallable(() -> primaryUserDataRepository.findByUserName(updateUserRequestDto.getUserName()))
                 // Cache primary user data (if applicable)
@@ -62,7 +56,6 @@ public class UpdateUserServiceImpl implements UpdateUserService {
                 })
                 .then(Mono.defer(() -> {
                     log.info("LOG:: Profile data and primary user details updated successfully");
-                    commonResponse.setData("Updated successfully");
                     return profileDataUpdateSuccess(commonResponse);
                 }))
                 .subscribeOn(Schedulers.boundedElastic()); // Bounded concurrency
@@ -80,11 +73,11 @@ public class UpdateUserServiceImpl implements UpdateUserService {
 
             return Mono.fromCallable(() -> profileDataRepository.findByUserName(updateUserRequestDto.getUserName()))
                     // Cache primary user data (if applicable)
-                    .map(profileData -> {
+                    .flatMap(profileData -> {
                         if (profileData != null) {
                             log.info("LOG:: UpdateUserServiceImpl updateSpecs profileData username: {}", profileData.getUserName());
                             return fetchSportDataAsync(profileData.getUserName())
-                                    .map(userSports -> {
+                                    .flatMap(userSports -> {
                                         if (userSports != null) {
                                             log.info("LOG:: userSports data found for username: {}", userSports.getUserName());
                                             // Use a locking mechanism to synchronize profile updates
@@ -122,7 +115,7 @@ public class UpdateUserServiceImpl implements UpdateUserService {
 
             return Mono.fromCallable(() -> profileDataRepository.findByUserName(updateSkillsRequest.getUserName()))
                     // Cache primary user data (if applicable)
-                    .map(profileData -> {
+                    .flatMap(profileData -> {
                         if (profileData != null) {
                             log.info("LOG:: UpdateUserServiceImpl updateSpecs profileData username: {}", profileData.getUserName());
                             return commonMethods.updateSkillsAndSports(updateSkillsRequest,
@@ -149,7 +142,7 @@ public class UpdateUserServiceImpl implements UpdateUserService {
 
             return Mono.fromCallable(() -> profileDataRepository.findByUserName(achievementRequest.getUserName()))
                     // Cache primary user data (if applicable)
-                    .map(profileData -> {
+                    .flatMap(profileData -> {
                         if (profileData != null) {
                             log.info("LOG:: UpdateUserServiceImpl updateAchievements profileData username: {}", profileData.getUserName());
                             return commonMethods.updateAchievements(achievementRequest,
@@ -170,13 +163,13 @@ public class UpdateUserServiceImpl implements UpdateUserService {
     }
 
     @Override
-    public Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto, CommonResponse commonResponse) {
+    public Mono<CommonResponse> updateInstitution( InstitutionsRequestDto institutionsRequestDto, CommonResponse commonResponse) {
         return Mono.defer(() -> {
             log.info("LOG:: UpdateUserServiceImpl updateInstitution for username: {}", institutionsRequestDto.getUserName());
 
             return Mono.fromCallable(() -> profileDataRepository.findByUserName(institutionsRequestDto.getUserName()))
                     // Cache primary user data (if applicable)
-                    .map(profileData -> {
+                    .flatMap(profileData -> {
                         if (profileData != null) {
                             log.info("LOG:: UpdateUserServiceImpl updateInstitution profileData username: {}", profileData.getUserName());
                             return commonMethods.updateInstitution(institutionsRequestDto,

@@ -104,29 +104,6 @@ public  class CommonMethods {
                 .build();
 
     }
-    public Mono<CommonResponse> updatePrimaryAndProfileData(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData, ProfileData profileData, CommonResponse commonResponse) {
-
-        updateProfileDataConditionally(updateUserRequestDto, primaryUserData);
-        updateUserDetailsConditionally(updateUserRequestDto, profileData);
-
-        return Mono.defer(() ->
-                        Mono.fromCallable(() -> {
-                            // Save the updated data asynchronously on a separate scheduler
-                            PrimaryUserDetails savedPrimaryUserData = savePrimaryUserData(primaryUserData);
-                            ProfileData savedProfileData = saveProfileData(profileData);
-
-                            // Return the saved data
-                            return Mono.just(Tuples.of(savedPrimaryUserData, savedProfileData));
-                        })
-                )
-                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
-                .flatMap(savedDataMono -> savedDataMono)
-                .flatMap(savedData -> {
-                    log.info("LOG:: Updating primary user details and profile data completed");
-                    commonResponse.setData(savedData);
-                    return profileDataUpdateSuccess(commonResponse);
-                });
-    }
 
     private PrimaryUserDetails savePrimaryUserData(PrimaryUserDetails primaryUserData) {
         // Simulate saving PrimaryUserDetails asynchronously
@@ -244,14 +221,36 @@ public  class CommonMethods {
         Optional.ofNullable(achievementRequest.getAchievements()).ifPresent(profileData::setAchievements);
         return profileData;
     }
+    public Mono<CommonResponse> updatePrimaryAndProfileData(PersonalInformationRequestDto updateUserRequestDto, PrimaryUserDetails primaryUserData, ProfileData profileData, CommonResponse commonResponse) {
 
-    public Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto, ProfileData profileData, CommonResponse commonResponse) {
-        ProfileData profileData1 = updateInstitutionConditionally(institutionsRequestDto, profileData);
+        updateProfileDataConditionally(updateUserRequestDto, primaryUserData);
+        updateUserDetailsConditionally(updateUserRequestDto, profileData);
 
         return Mono.defer(() ->
                         Mono.fromCallable(() -> {
                             // Save the updated data asynchronously on a separate scheduler
-                            ProfileData savedProfileData = saveProfileData(profileData1);
+                            PrimaryUserDetails savedPrimaryUserData = savePrimaryUserData(primaryUserData);
+                            ProfileData savedProfileData = saveProfileData(profileData);
+
+                            // Return the saved data
+                            return Mono.just(Tuples.of(savedPrimaryUserData, savedProfileData));
+                        })
+                )
+                .subscribeOn(Schedulers.boundedElastic()) // Execute the blocking call on a separate scheduler
+                .flatMap(savedDataMono -> savedDataMono)
+                .flatMap(savedData -> {
+                    log.info("LOG:: Updating primary user details and profile data completed");
+                    commonResponse.setData(savedData);
+                    return profileDataUpdateSuccess(commonResponse);
+                });
+    }
+    public Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto, ProfileData profileData, CommonResponse commonResponse) {
+        updateInstitutionConditionally(institutionsRequestDto, profileData);
+
+        return Mono.defer(() ->
+                        Mono.fromCallable(() -> {
+                            // Save the updated data asynchronously on a separate scheduler
+                            ProfileData savedProfileData = saveProfileData(profileData);
                             // Return the saved data
                             return Mono.just(savedProfileData);
                         })
@@ -265,9 +264,8 @@ public  class CommonMethods {
                 });
     }
 
-    private ProfileData updateInstitutionConditionally(InstitutionsRequestDto institutionsRequestDto, ProfileData profileData) {
+    private void updateInstitutionConditionally(InstitutionsRequestDto institutionsRequestDto, ProfileData profileData) {
         Optional.ofNullable(institutionsRequestDto.getInstituteDetails()).ifPresent(profileData::setInstituteDetails);
-        return profileData;
     }
 
 

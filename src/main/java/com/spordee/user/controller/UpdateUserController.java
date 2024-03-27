@@ -9,6 +9,7 @@ import com.spordee.user.dto.response.common.MetaData;
 import com.spordee.user.service.UpdateUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import static com.spordee.user.util.ResponseMethods.userNotFound;
 @RequestMapping("${api.class.class-update-user.header}")
 @RequiredArgsConstructor
 public class UpdateUserController {
+
     private final UpdateUserService userService;
 
     @PatchMapping("${api.class.class-update-user.methods.personal-details}")
@@ -112,7 +114,7 @@ public class UpdateUserController {
     }
 
     @PatchMapping("${api.class.class-update-user.methods.institution}")
-    public Mono<CommonResponse> updateInstitution(InstitutionsRequestDto institutionsRequestDto,@CurrentUser Principal principal){
+    public Mono<CommonResponse> updateInstitution(@RequestBody InstitutionsRequestDto institutionsRequestDto,@CurrentUser Principal principal){
          String username = principal.getName();
         CommonResponse commonResponse = new CommonResponse();
         if(username.isBlank()){
