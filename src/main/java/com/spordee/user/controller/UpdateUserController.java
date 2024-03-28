@@ -45,7 +45,6 @@ public class UpdateUserController {
                     log.error("Error occurred while updating personal details for user {}", username, exception);
                   return internalServerError(commonResponse);
                 });
-
     }
 
     @PatchMapping("${api.class.class-update-user.methods.specs}")

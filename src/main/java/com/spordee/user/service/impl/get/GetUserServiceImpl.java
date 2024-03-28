@@ -1,12 +1,9 @@
 package com.spordee.user.service.impl.get;
 
 import com.spordee.user.dto.response.common.CommonResponse;
-import com.spordee.user.dto.response.common.MetaData;
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
 import com.spordee.user.entity.profiledata.ProfileData;
 import com.spordee.user.entity.sportsuserdata.UserSports;
-import com.spordee.user.enums.CommonMessages;
-import com.spordee.user.enums.StatusType;
 import com.spordee.user.repository.PrimaryUserDataRepository;
 import com.spordee.user.repository.ProfileDataRepository;
 import com.spordee.user.repository.SportsRepository;
@@ -14,12 +11,12 @@ import com.spordee.user.service.GetUserService;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import java.util.concurrent.Callable;
 
 import static com.spordee.user.util.ResponseMethods.*;
 
@@ -64,7 +61,7 @@ public class GetUserServiceImpl implements GetUserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Mono<CommonResponse> getAllData(CommonResponse commonResponse, String username) {
+    public Mono<CommonResponse> getUsersAllData(CommonResponse commonResponse, String username) {
         final CommonResponse finalCommonResponse = commonResponse; // Make a final copy
         return getCombinedData(username)
                 .map(combinedData -> {
@@ -75,6 +72,19 @@ public class GetUserServiceImpl implements GetUserService {
                 .switchIfEmpty(Mono.defer(() ->
                         profileDataIsNullWhenGet(commonResponse)));
     }
+
+//    @Override
+//    public Mono<CommonResponse> getAllData(CommonResponse commonResponseMono) {
+//        return commonResponseMono
+//                .flatMapMany(commonResponse ->
+//                        primaryUserDataRepository.findAllc() // Replace with your actual data access method
+//                )
+//                .collectList() // Collect all data into a Flux
+//                .map(dataList -> ResponseEntity.ok().body(Flux.fromIterable(dataList))) // Create successful response
+//                .onErrorResume(throwable -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                        .body(Flux.just(new CommonResponse())))); // Handle errors gracefully
+//    }
+
     private Mono<UserSports> fetchSportsDetailsAsync(String username) {
         return Mono.fromCallable(() -> sportsRepository.findByUserName(username)).subscribeOn(Schedulers.boundedElastic());
     }
@@ -84,12 +94,9 @@ public class GetUserServiceImpl implements GetUserService {
     }
 
     private Mono<ProfileData> fetchProfileDetailsAsync(String username) {
-        return Mono.fromCallable(new Callable<ProfileData>() {
-            @Override
-            public ProfileData call() throws Exception {
-                return profileDataRepository.findByUserName(username);
-            }
-        }).subscribeOn(Schedulers.boundedElastic());
+        return Mono.fromCallable(() ->
+                profileDataRepository.findByUserName(username))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }
 

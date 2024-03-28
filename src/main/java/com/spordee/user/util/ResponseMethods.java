@@ -7,6 +7,7 @@ import com.spordee.user.enums.StatusType;
 import com.spordee.user.dto.response.common.CommonResponse;
 import com.spordee.user.dto.response.common.MetaData;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -18,7 +19,16 @@ public class ResponseMethods {
        commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
        return Mono.just(commonResponse);
     }
-
+    public static Mono<CommonResponse> usersNotFound(CommonResponse commonResponse){
+        commonResponse.setStatus(StatusType.STATUS_FAIL);
+        commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
+        return Mono.just(commonResponse);
+   }
+    public static  Flux<CommonResponse> internalServerError2(CommonResponse commonResponse){
+        commonResponse.setStatus(StatusType.STATUS_FAIL);
+        commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error on Server"));
+        return Flux.just(commonResponse);
+    }
     public static Mono<CommonResponse> internalServerError(CommonResponse commonResponse){
         commonResponse.setStatus(StatusType.STATUS_FAIL);
         commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error on Server"));
