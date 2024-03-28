@@ -44,11 +44,6 @@ public  class CommonMethods {
         return Instant.now().getEpochSecond();
     }
 
-
-
-
-
-
     public static List<UserImages> saveUserImagesFromDto(List<UserImagesDto> userImagesDtoList, long currentTime) {
         if (!userImagesDtoList.isEmpty()) {
             return userImagesDtoList.stream()

@@ -25,9 +25,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-//@CompoundIndexes({
-//        @CompoundIndex(name = "user_name", def = "{'email.id' : 1, 'age': 1}")
-//})
+
 public class ProfileData {
     @Id
     private String id;

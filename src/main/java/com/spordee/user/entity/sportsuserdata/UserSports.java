@@ -1,5 +1,6 @@
 package com.spordee.user.entity.sportsuserdata;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.spordee.user.entity.sportsuserdata.cascadetables.sports.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Document( "user_sports")
 public class UserSports {
 

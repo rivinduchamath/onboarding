@@ -43,9 +43,6 @@ public class PrimaryUserDetails {
     @Indexed(name = "country_code")
     private String countryCode;
     private Set<String> languages;
-
-
-
     private String city;
     @Indexed(name = "is_premium")
     private boolean isPremium;
