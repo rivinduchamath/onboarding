@@ -3,6 +3,8 @@ package com.spordee.user.entity.sportsuserdata;
 import com.spordee.user.entity.sportsuserdata.cascadetables.sports.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -11,28 +13,28 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @AllArgsConstructor
 @Builder
-@ToString
 @NoArgsConstructor
-@Document("user_sports")
+@Document( "user_sports")
 public class UserSports {
 
     @Id
-    @Field("user_name")
+    private String id;
+    @Indexed(name = "user_name",unique = true )
     private String userName;
-    @Field("soccer")
+    @Indexed(name = "soccer")
     private Soccer soccer;
     private Basketball basketball;
     private Cricket cricket;
-    @Field("american_football")
+    @Indexed(name = "american_football")
     private AmericanFootball americanFootball;
-    @Field("hockey")
+    @Indexed(name = "hockey")
     private IceHockey hockey;
-    @Field("baseball")
+    @Indexed(name = "baseball")
     private Baseball baseball;
-    @Field("rugby")
+    @Indexed(name = "rugby")
     private Rugby rugby;
-    @Field("created_date")
+    @Indexed(name = "created_date")
     private String createdDate; // Epoch Time
-    @Field("updated_date")
+    @Indexed(name = "updated_date")
     private String updatedDate;// Epoch Time
 }

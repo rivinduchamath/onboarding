@@ -21,7 +21,7 @@ import java.util.Set;
 @Setter
 @Getter
 @AllArgsConstructor
-@Document("profile_data")
+@Document( "profile_data")
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -31,26 +31,25 @@ import java.util.Set;
 public class ProfileData {
     @Id
     private String id;
-    @Field("long_description")
+    @Indexed(name = "long_description")
     private String longDescription;
-    @Field("short_description")
+    @Indexed(name = "short_description")
     private String shortDescription;
-    @Field("user_name")
-    @TextIndexed
+    @Indexed(name = "user_name" ,unique = true)
     private String userName;
     private String email;
     private String name;
     private String birthDay;
-    @Field("phone_number")
+    @Indexed(name = "phone_number")
     private String phoneNumber;
-    @Field("birth_country")
+    @Indexed(name = "birth_country")
     private String birthCountry;
     private String citizenShip;
-    @Field("place_of_birth")
+    @Indexed(name = "place_of_birth")
     private String placeOfBirth;
-    @Field("country_of_residence")
+    @Indexed(name = "country_of_residence")
     private String countryOfResidence;
-    @Field("place_of_residence")
+    @Indexed(name = "place_of_residence")
     private String placeOfResidence;
     private Set<String> languages;
     private String height;
@@ -59,27 +58,27 @@ public class ProfileData {
     private Map<String, String> endorsement;
     private Map<String, String> recommendations;
     private Map<String, String> stats;
-    @DBRef
-    @Field("user_mobile_numbers")
+
+    @Indexed(name = "user_mobile_numbers")
     private List<UserMobileNumber> userMobileNumbers;
-    @DBRef
-    @Field("user_bookmarks")
+
+    @Indexed(name = "user_bookmarks")
     private List<Bookmarks> bookmarks;
-    @DBRef
-    @Field("user_address")
+
+    @Indexed(name = "user_address")
     private List<UserAddress> userAddress;
-    @DBRef
-    @Field("user_experience")
+
+    @Indexed(name = "user_experience")
     private List<UserExperience> userExperience;
-    @DBRef
-    @Field("user_videos")
+
+    @Indexed(name = "user_videos")
     private List<UserVideo> userVideos;
-    @Field("created_date")
+    @Indexed(name = "created_date")
     private long createdDate; // Epoch Time
-    @Field("updated_date")
+    @Indexed(name = "updated_date")
     private long updatedDate;// Epoch Time
     private List<Achievements> achievements;
-    @Field("institute_details")
+    @Indexed(name = "institute_details")
     private List<InstituteDetails> instituteDetails;
 
 

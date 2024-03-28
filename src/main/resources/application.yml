@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://xenia:xenia@xenia.0r1mx1j.mongodb.net/phaseTwoDatabase3?retryWrites=true&w=majority&ssl=true&authMechanism=SCRAM-SHA-1
+      uri: mongodb+srv://xenia:xenia@xenia.0r1mx1j.mongodb.net/new1?retryWrites=true&w=majority&ssl=true&authMechanism=SCRAM-SHA-1
       auto-index-creation: true
 #      host: localhost
 #      port: 27017
@@ -32,5 +32,5 @@ api:
     class-load-user:
       header: /user/load
       methods:
-        institution: /v1/institutions/get
+        all: /v1/all/get
         personal-details: /V1/personal-details/get

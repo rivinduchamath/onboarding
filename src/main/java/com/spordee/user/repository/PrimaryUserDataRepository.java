@@ -1,7 +1,7 @@
 package com.spordee.user.repository;
 
 import com.spordee.user.entity.primaryUserData.PrimaryUserDetails;
-import io.micrometer.observation.ObservationFilter;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;

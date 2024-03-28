@@ -51,12 +51,12 @@ public class UserServiceImpl implements UserService {
                             .basketball(initialUserSaveRequestDto.getUserSportsDtos().getBasketball())
                             .build();
 
-            UserSports sports =  sportsRepository.save(userSports);
+         UserSports sports =  sportsRepository.insert(userSports);
             primaryUserDetails.setUserSports(sports);
         }
-        ProfileData saveProfile = profileDataRepository.save(profileData);
+        ProfileData saveProfile = profileDataRepository.insert(profileData);
         log.info("ProfileData is saved {}",saveProfile);
-        PrimaryUserDetails save = primaryUserDataRepository.save(primaryUserDetails);
+        PrimaryUserDetails save = primaryUserDataRepository.insert(primaryUserDetails);
         return Mono.just(save).map(savedPrimaryUserDetails -> {
             commonResponse.setData(savedPrimaryUserDetails);
             commonResponse.setStatus(StatusType.STATUS_SUCCESS);

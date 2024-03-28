@@ -1,6 +1,6 @@
 package com.spordee.user.configurations.redis;
 
-import com.cog.gateway.entity.TokenStorage;
+import com.spordee.user.entity.TokenStorage;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,12 +8,10 @@ import org.springframework.data.redis.core.convert.KeyspaceConfiguration;
 import org.springframework.data.redis.core.convert.MappingConfiguration;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.redis.core.mapping.RedisMappingContext;
-
 import java.util.List;
 
 @Configuration
 public class RedisConfiguration extends KeyspaceConfiguration{
-
 
     @Bean
     public RedisMappingContext keyValueMappingContext() {

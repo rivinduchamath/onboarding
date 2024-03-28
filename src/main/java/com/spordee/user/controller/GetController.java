@@ -22,8 +22,8 @@ import static com.spordee.user.util.ResponseMethods.userNotFound;
 @RequiredArgsConstructor
 public class GetController {
     private final GetUserService getUserService;
-    @GetMapping("${api.class.class-load-user.methods.institution}")
-    public Mono<CommonResponse> getInstitutions(@CurrentUser Principal principal){
+    @GetMapping("${api.class.class-load-user.methods.all}")
+    public Mono<CommonResponse> getAllData(@CurrentUser Principal principal){
         String username = principal.getName();
         CommonResponse commonResponse = new CommonResponse();
         if(username.isBlank()){
@@ -31,24 +31,9 @@ public class GetController {
         }
         log.info("getInstitutions Personal details getInstitutions for user Id {}",principal.getName());
 
-        return getUserService.getInstitutions(commonResponse, username)
+        return getUserService.getAllData(commonResponse, username)
                 .onErrorResume(exception -> {
                     log.error("Error occurred while getInstitutions personal details for user {}", username);
-                    return internalServerError(commonResponse);
-                });
-    }
-    @GetMapping("${api.class.class-load-user.methods.personal-details}")
-    public Mono<CommonResponse> getPersonalDetails(@CurrentUser Principal principal){
-        String username = principal.getName();
-        CommonResponse commonResponse = new CommonResponse();
-        if(username.isBlank()){
-            return userNotFound(commonResponse);
-        }
-        log.info("LOG:: GET Controller Personal details getPersonalDetails for user Id {}",principal.getName());
-
-        return getUserService.getPersonalDetails(commonResponse, username)
-                .onErrorResume(exception -> {
-                    log.error("Error occurred while getPersonalDetails personal details for user {}", username);
                     return internalServerError(commonResponse);
                 });
     }
