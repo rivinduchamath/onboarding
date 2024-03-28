@@ -21,7 +21,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.Callable;
 
-import static com.spordee.user.util.ResponseMethods.profileDataIsNull;
+import static com.spordee.user.util.ResponseMethods.*;
 
 @Service
 @Slf4j
@@ -62,7 +62,6 @@ public class GetUserServiceImpl implements GetUserService {
         });
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public Mono<CommonResponse> getAllData(CommonResponse commonResponse, String username) {
@@ -71,10 +70,10 @@ public class GetUserServiceImpl implements GetUserService {
                 .map(combinedData -> {
                     CommonResponse responseToUse = finalCommonResponse != null ? finalCommonResponse : new CommonResponse(); // Use the final copy or create a new instance
                     responseToUse.setData(combinedData);
-                    return responseToUse;
+                    return profileDataIsSuccessWhenGet(responseToUse);
                 })
                 .switchIfEmpty(Mono.defer(() ->
-                        profileDataIsNull(commonResponse)));
+                        profileDataIsNullWhenGet(commonResponse)));
     }
     private Mono<UserSports> fetchSportsDetailsAsync(String username) {
         return Mono.fromCallable(() -> sportsRepository.findByUserName(username)).subscribeOn(Schedulers.boundedElastic());

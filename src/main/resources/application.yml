@@ -32,5 +32,5 @@ api:
     class-load-user:
       header: /user/load
       methods:
-        all: /v1/all/get
+        all: /v1/get/all
         personal-details: /V1/personal-details/get

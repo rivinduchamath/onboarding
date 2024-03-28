@@ -29,7 +29,16 @@ public class ResponseMethods {
         commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while updating personal details"));
         return Mono.just(commonResponse);
     }
-
+    public static CommonResponse profileDataIsSuccessWhenGet(CommonResponse commonResponse){
+        commonResponse.setStatus(StatusType.STATUS_SUCCESS);
+        commonResponse.setMeta(new MetaData(false, CommonMessages.REQUEST_SUCCESS, 200, "Fetch Success"));
+        return commonResponse;
+    }
+    public static Mono<CommonResponse> profileDataIsNullWhenGet(CommonResponse commonResponse){
+        commonResponse.setStatus(StatusType.STATUS_FAIL);
+        commonResponse.setMeta(new MetaData(true, CommonMessages.INTERNAL_SERVER_ERROR, 500, "Error occurred while Getting data"));
+        return Mono.just(commonResponse);
+    }
     public static CommonResponse profileDataGetSuccess(CommonResponse commonResponse){
         commonResponse.setStatus(StatusType.STATUS_SUCCESS);
         commonResponse.setMeta(new MetaData(false, CommonMessages.REQUEST_SUCCESS, 200, "Fetch Success"));

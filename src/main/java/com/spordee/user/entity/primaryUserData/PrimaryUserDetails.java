@@ -54,16 +54,13 @@ public class PrimaryUserDetails {
     private boolean openJob;
     @Indexed(name = "is_verified")
     private boolean isVerified;
-
     @Indexed(name = "created_date")
     private long createdDate;
     @Indexed(name = "updated_date")
     private long updatedDate;
     private List<String> roles;
-//    @DBRef
     @Indexed(name = "user_images")
     private List<UserImages> userImage;
-    
     private UserSports userSports;
     private String favClubTeam;
     private String favPlayer;
